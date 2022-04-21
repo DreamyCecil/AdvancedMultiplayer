@@ -248,21 +248,23 @@ functions:
       break;
     }
     case DDT_PALM: {
-      Debris_Begin(EIBT_WOOD, DPT_NONE, BET_NONE, fEntitySize, penmhDestroyed->m_vDamage*0.3f, FLOAT3D(0,0,0), 1.0f, 0.0f);
-      Debris_Spawn(penmhDestroyed, this, MODEL_WOOD, TEXTURE_WOOD, 0, 0, 0, 0, m_fDebrisSize,
-        FLOAT3D(0.5f, 0.2f, 0.5f));
-      Debris_Spawn(penmhDestroyed, this, MODEL_WOOD, TEXTURE_WOOD, 0, 0, 0, 1, m_fDebrisSize,
-        FLOAT3D(0.5f, 0.3f, 0.5f));
-      Debris_Spawn(penmhDestroyed, this, MODEL_WOOD, TEXTURE_WOOD, 0, 0, 0, 2, m_fDebrisSize,
-        FLOAT3D(0.5f, 0.4f, 0.5f));
-      Debris_Spawn(penmhDestroyed, this, MODEL_WOOD, TEXTURE_WOOD, 0, 0, 0, 3, m_fDebrisSize,
-        FLOAT3D(0.5f, 0.5f, 0.5f));
-      Debris_Spawn(penmhDestroyed, this, MODEL_WOOD, TEXTURE_WOOD, 0, 0, 0, 1, m_fDebrisSize,
-        FLOAT3D(0.5f, 0.6f, 0.5f));
-      Debris_Spawn(penmhDestroyed, this, MODEL_WOOD, TEXTURE_WOOD, 0, 0, 0, 2, m_fDebrisSize,
-        FLOAT3D(0.5f, 0.8f, 0.5f));
-      Debris_Spawn(penmhDestroyed, this, MODEL_WOOD, TEXTURE_WOOD, 0, 0, 0, 1, m_fDebrisSize,
-        FLOAT3D(0.5f, 0.9f, 0.5f));
+      if (GetSP()->sp_iDebris == 2) {
+        Debris_Begin(EIBT_WOOD, DPT_NONE, BET_NONE, fEntitySize, penmhDestroyed->m_vDamage*0.3f, FLOAT3D(0,0,0), 1.0f, 0.0f);
+        Debris_Spawn(penmhDestroyed, this, MODEL_WOOD, TEXTURE_WOOD, 0, 0, 0, 0, m_fDebrisSize,
+          FLOAT3D(0.5f, 0.2f, 0.5f));
+        Debris_Spawn(penmhDestroyed, this, MODEL_WOOD, TEXTURE_WOOD, 0, 0, 0, 1, m_fDebrisSize,
+          FLOAT3D(0.5f, 0.3f, 0.5f));
+        Debris_Spawn(penmhDestroyed, this, MODEL_WOOD, TEXTURE_WOOD, 0, 0, 0, 2, m_fDebrisSize,
+          FLOAT3D(0.5f, 0.4f, 0.5f));
+        Debris_Spawn(penmhDestroyed, this, MODEL_WOOD, TEXTURE_WOOD, 0, 0, 0, 3, m_fDebrisSize,
+          FLOAT3D(0.5f, 0.5f, 0.5f));
+        Debris_Spawn(penmhDestroyed, this, MODEL_WOOD, TEXTURE_WOOD, 0, 0, 0, 1, m_fDebrisSize,
+          FLOAT3D(0.5f, 0.6f, 0.5f));
+        Debris_Spawn(penmhDestroyed, this, MODEL_WOOD, TEXTURE_WOOD, 0, 0, 0, 2, m_fDebrisSize,
+          FLOAT3D(0.5f, 0.8f, 0.5f));
+        Debris_Spawn(penmhDestroyed, this, MODEL_WOOD, TEXTURE_WOOD, 0, 0, 0, 1, m_fDebrisSize,
+          FLOAT3D(0.5f, 0.9f, 0.5f));
+      }
                     } break;
     default: {} break;
     };
@@ -279,13 +281,15 @@ functions:
         CPlacement3D plDust=penmhDestroyed->GetPlacement();
         plDust.pl_PositionVector=plDust.pl_PositionVector+FLOAT3D(0,fY,0);
         // spawn dust effect
-        ESpawnEffect ese;
-        ese.colMuliplier = C_WHITE|CT_OPAQUE;
-        ese.vStretch = FLOAT3D(m_fDustStretch,m_fDustStretch,m_fDustStretch);
-        ese.vNormal = FLOAT3D(0,1,0);
-        ese.betType = BET_DUST_FALL;
-        CEntityPointer penFX = CreateEntity(plDust, CLASS_BASIC_EFFECT);
-        penFX->Initialize(ese);
+        if (GetSP()->sp_bEffects) {
+          ESpawnEffect ese;
+          ese.colMuliplier = C_WHITE|CT_OPAQUE;
+          ese.vStretch = FLOAT3D(m_fDustStretch,m_fDustStretch,m_fDustStretch);
+          ese.vNormal = FLOAT3D(0,1,0);
+          ese.betType = BET_DUST_FALL;
+          CEntityPointer penFX = CreateEntity(plDust, CLASS_BASIC_EFFECT);
+          penFX->Initialize(ese);
+        }
       }
     }
   }

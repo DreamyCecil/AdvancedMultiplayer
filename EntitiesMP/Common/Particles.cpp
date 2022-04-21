@@ -36,6 +36,7 @@ static CTextureObject _toStar08;
 static CTextureObject _toBlood;
 static CTextureObject _toWaterfallGradient;
 static CTextureObject _toGhostbusterBeam;
+static CTextureObject _toCustomRay;
 static CTextureObject _toLightning;
 static CTextureObject _toSand;
 static CTextureObject _toSandFlowGradient;
@@ -195,6 +196,7 @@ void InitParticles(void)
     _toStar08.SetData_t(CTFILENAME("Models\\Items\\Particles\\Star08.tex"));
     _toWaterfallGradient.SetData_t(CTFILENAME("Models\\Effects\\Heatmaps\\Waterfall08.tex"));
     _toGhostbusterBeam.SetData_t(CTFILENAME("Models\\Weapons\\GhostBuster\\Projectile\\Ray.tex"));
+    _toCustomRay.SetData_t(CTFILENAME("Models\\ST27\\Ray.tex"));
     _toLightning.SetData_t(CTFILENAME("Textures\\Effects\\Particles\\Lightning.tex"));
     _toSand.SetData_t(CTFILENAME("Textures\\Effects\\Particles\\Sand.tex"));
     _toSandFlowGradient.SetData_t(CTFILENAME("Models\\Effects\\Heatmaps\\SandFlow01.tex"));
@@ -309,6 +311,7 @@ void CloseParticles(void)
   _toLavaTrailGradient.SetData(NULL);
   _toWaterfallGradient.SetData(NULL);
   _toGhostbusterBeam.SetData( NULL);
+  _toCustomRay.SetData( NULL);
   _toLightning.SetData( NULL);
   _toLavaTrailSmoke.SetData(NULL);
   _toFlamethrowerTrail01.SetData(NULL);
@@ -549,20 +552,6 @@ void Particles_ViewerLocal(CEntity *penView)
     _ctFlameThrowerParticles=0;
     Particle_Flush();
   }
-
-  /*
-  if(_ctFlameThrowerPipeParticles!=0)
-  {
-    Particle_PrepareTexture( &_toLavaTrailSmoke, PBT_ADDALPHA);
-    Particle_SetTexturePart( 512, 512, 0, 0);
-    for( INDEX iFlameStart=0; iFlameStart<ClampUp(_ctFlameThrowerPipeParticles, MAX_FLAME_PARTICLES); iFlameStart++)
-    {
-      FlameThrowerParticleRenderingData &ftprd=_aftprdFlamePipe[iFlameStart];
-      Particle_RenderSquare( ftprd.ftprd_vPos, ftprd.ftprd_fSize, ftprd.ftprd_fAngle, ftprd.ftprd_colColor);
-    }
-    _ctFlameThrowerPipeParticles=0;
-    Particle_Flush();
-  }*/
 }
 
 // different particle effects
@@ -2499,6 +2488,26 @@ void Particles_Ghostbuster(const FLOAT3D &vSrc, const FLOAT3D &vDst, INDEX ctRay
       Particle_RenderLine( v0, v1, 0.125f*fSize, colFade|0xFF);
       v0 = v1;
     }
+  }
+  // all done
+  Particle_Flush();
+}
+
+void Particles_CustomRay(const FLOAT3D &vSrc, const FLOAT3D &vDst, FLOAT fSize, COLOR colCustomRay) {
+  Particle_PrepareTexture(&_toCustomRay, PBT_ADD);
+  Particle_SetTexturePart( 2048, 2048, 0, 0);
+
+  FLOAT3D vZ = vDst-vSrc;
+  FLOAT fLen = vZ.Length();
+  vZ.Normalize();
+
+  const FLOAT fStep = fLen/33.3333333f;
+
+  FLOAT3D v0 = vSrc;
+  for(FLOAT fPos=fStep; fPos<fLen+fStep/2; fPos+=fStep) {
+    FLOAT3D v1 = vSrc+(vZ*fPos);
+	Particle_RenderLine( v0, v1, fSize, colCustomRay);
+	v0 = v1;
   }
   // all done
   Particle_Flush();

@@ -219,16 +219,18 @@ functions:
     FLOAT3D vBodySpeed = en_vCurrentTranslationAbsolute-en_vGravityDir*(en_vGravityDir%en_vCurrentTranslationAbsolute);
 
     // spawn debris
-    Debris_Begin(EIBT_BONES, DPT_NONE, BET_NONE, fEntitySize, vNormalizedDamage, vBodySpeed, 5.0f, 2.0f);
+    if (GetSP()->sp_iDebris == 2) {
+      Debris_Begin(EIBT_BONES, DPT_NONE, BET_NONE, fEntitySize, vNormalizedDamage, vBodySpeed, 5.0f, 2.0f);
     
-    Debris_Spawn(this, this, MODEL_BONEMAN_BODY, TEXTURE_BONEMAN, 0, 0, 0, 0, 0.0f,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-    Debris_Spawn(this, this, MODEL_BONEMAN_HAND, TEXTURE_BONEMAN, 0, 0, 0, 0, 0.0f,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-    Debris_Spawn(this, this, MODEL_BONEMAN_HAND, TEXTURE_BONEMAN, 0, 0, 0, 0, 0.0f,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-    Debris_Spawn(this, this, MODEL_BONEMAN_LEGS, TEXTURE_BONEMAN, 0, 0, 0, 0, 0.0f,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
+      Debris_Spawn(this, this, MODEL_BONEMAN_BODY, TEXTURE_BONEMAN, 0, 0, 0, 0, 0.0f,
+        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
+      Debris_Spawn(this, this, MODEL_BONEMAN_HAND, TEXTURE_BONEMAN, 0, 0, 0, 0, 0.0f,
+        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
+      Debris_Spawn(this, this, MODEL_BONEMAN_HAND, TEXTURE_BONEMAN, 0, 0, 0, 0, 0.0f,
+        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
+      Debris_Spawn(this, this, MODEL_BONEMAN_LEGS, TEXTURE_BONEMAN, 0, 0, 0, 0, 0.0f,
+        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
+    }
 
     // hide yourself (must do this after spawning debris)
     SwitchToEditorModel();

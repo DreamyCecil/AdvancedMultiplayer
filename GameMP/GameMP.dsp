@@ -43,7 +43,8 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /Yu"stdafx.h" /c
-# ADD CPP /nologo /G5 /MD /W3 /GX /Zi /Ox /Ot /Og /Oi /Oy- /I "F:\SeriousSam\_SDK\_GlobalIncludes" /I "F:\SeriousSam\SamMods\Mods\<MOD>\Sources" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /D "GAME_EXPORTS" /Yu"stdafx.h" /FD /c
+# ADD CPP /nologo /G5 /MD /W3 /GX /Zi /Ox /Ot /Og /Oi /Oy- /I "$(ENGINE_DIR)\Sources" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /D "GAME_EXPORTS" /Yu"stdafx.h" /FD /c
+# SUBTRACT CPP /Oa /Ow /Gf /Fr
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG" /d "_AFXDLL"
@@ -53,15 +54,15 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 user32.lib /nologo /subsystem:windows /dll /map /debug /machine:I386 /pdbtype:sept /libpath:"F:\SeriousSam\_SDK\_GlobalIncludes"
-# SUBTRACT LINK32 /pdb:none
-# Begin Custom Build - Copying $(InputName) binaries to F:\SeriousSam\SamMods\Mods\<MOD>\Bin
+# ADD LINK32 user32.lib /nologo /subsystem:windows /dll /map /debug /machine:I386 /pdbtype:sept /libpath:"$(ENGINE_DIR)\Bin"
+# SUBTRACT LINK32 /profile /incremental:yes
+# Begin Custom Build - Copying $(InputName) binaries to $(ENGINE_DIR)\Bin
 InputPath=.\Release\GameMP.dll
 InputName=GameMP
 SOURCE="$(InputPath)"
 
-"F:\SeriousSam\SamMods\Mods\<MOD>\Bin\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy Release\$(InputName).dll F:\SeriousSam\SamMods\Mods\<MOD>\Bin >nul
+"$(ENGINE_DIR)\Bin\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy Release\$(InputName).dll $(ENGINE_DIR)\Bin >nul
 
 # End Custom Build
 
@@ -79,7 +80,8 @@ SOURCE="$(InputPath)"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /Yu"stdafx.h" /c
-# ADD CPP /nologo /G5 /MDd /W3 /Gm /GX /Zi /Od /I "F:\SeriousSam\_SDK\_GlobalIncludes" /I "F:\SeriousSam\SamMods\Mods\<MOD>\Sources" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /D "GAME_EXPORTS" /Yu"stdafx.h" /FD /c
+# ADD CPP /nologo /G5 /MDd /W3 /Gm /GX /Zi /Od /I "$(ENGINE_DIR)\Sources" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /D "GAME_EXPORTS" /Yu"stdafx.h" /FD /c
+# SUBTRACT CPP /Fr
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG" /d "_AFXDLL"
@@ -89,7 +91,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 user32.lib /nologo /subsystem:windows /dll /map /debug /machine:I386 /out:"Debug/GameMPD.dll" /pdbtype:sept /libpath:"F:\SeriousSam\_SDK\_GlobalIncludes"
+# ADD LINK32 user32.lib /nologo /subsystem:windows /dll /map /debug /machine:I386 /out:"Debug/GameMPD.dll" /pdbtype:sept /libpath:"$(ENGINE_DIR)\Bin"
 # SUBTRACT LINK32 /pdb:none
 # Begin Custom Build - Copying $(InputName) binaries to $(ENGINE_DIR)\Bin\Debug
 InputPath=.\Debug\GameMPD.dll

@@ -25,6 +25,7 @@ uses "EntitiesMP/Item";
 
 // weapon type 
 enum WeaponItemType {
+  0 WIT_KNIFE             "Knife",
   1 WIT_COLT              "Colt",
   2 WIT_SINGLESHOTGUN     "Single shotgun",
   3 WIT_DOUBLESHOTGUN     "Double shotgun",
@@ -37,7 +38,7 @@ enum WeaponItemType {
  10 WIT_LASER             "Laser",
  11 WIT_CHAINSAW          "Chainsaw",
  12 WIT_CANNON            "Cannon",
- 13 WIT_GHOSTBUSTER       "obsolete",
+ 13 WIT_RANDOM            "Random",
 };
 
 // event for sending through receive item
@@ -59,6 +60,8 @@ thumbnail "Thumbnails\\WeaponItem.tbn";
 properties:
   1 enum WeaponItemType m_EwitType    "Type" 'Y' = WIT_COLT,     // weapon
 
+100 BOOL m_bRandomizer = FALSE,
+
 components:
   0 class   CLASS_BASE        "Classes\\Item.ecl",
 
@@ -70,6 +73,12 @@ components:
  34 texture TEXTURE_COLTMAIN            "Models\\Weapons\\Colt\\ColtMain.tex",
  35 texture TEXTURE_COLTCOCK            "Models\\Weapons\\Colt\\ColtCock.tex",
  36 texture TEXTURE_COLTBULLETS         "Models\\Weapons\\Colt\\ColtBullets.tex",
+
+ 38 model   MODEL_KNIFE   "Models\\Weapons\\Knife\\KnifeItem.mdl",
+ 39 texture TEXTURE_KNIFE "Models\\Weapons\\Knife\\KnifeItem.tex",
+
+ 46 model   MODEL_CRATE   "Models\\ST27\\Crate.mdl",
+ 47 texture TEXTURE_CRATE "Models\\ST27\\Crate.tex",
 
 // ************** SINGLE SHOTGUN ************
  40 model   MODEL_SINGLESHOTGUN         "Models\\Weapons\\SingleShotgun\\SingleShotgunItem.mdl",
@@ -177,7 +186,10 @@ components:
 functions:
   void Precache(void) {
     PrecacheSound(SOUND_PICK);
+    PrecacheModel(MODEL_CRATE);
+    PrecacheTexture(TEXTURE_CRATE);
     switch (m_EwitType) {
+      case WIT_KNIFE:           CPlayerWeapons_Precache(1<<(INDEX(WEAPON_KNIFE          )-1)); break;
       case WIT_COLT:            CPlayerWeapons_Precache(1<<(INDEX(WEAPON_COLT           )-1)); break;
       case WIT_SINGLESHOTGUN:   CPlayerWeapons_Precache(1<<(INDEX(WEAPON_SINGLESHOTGUN  )-1)); break;
       case WIT_DOUBLESHOTGUN:   CPlayerWeapons_Precache(1<<(INDEX(WEAPON_DOUBLESHOTGUN  )-1)); break;
@@ -206,26 +218,12 @@ functions:
   // render particles
   void RenderParticles(void) {
     // no particles when not existing or in DM modes
-    if (GetRenderType()!=CEntity::RT_MODEL || GetSP()->sp_gmGameMode>CSessionProperties::GM_COOPERATIVE
+    if (GetRenderType()!=CEntity::RT_MODEL || !(GetSP()->sp_bCooperative)
       || !ShowItemParticles())
     {
       return;
     }
-    switch (m_EwitType) {
-      case WIT_COLT:             Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_SINGLESHOTGUN:    Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_DOUBLESHOTGUN:    Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_TOMMYGUN:         Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_MINIGUN:          Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_ROCKETLAUNCHER:   Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_GRENADELAUNCHER:  Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_SNIPER:           Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_FLAMER:           Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_CHAINSAW:         Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_LASER:            Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_GHOSTBUSTER:      Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-      case WIT_CANNON:           Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);  break;
-    }
+    Particles_Atomic(this, 1.5f, 1.5f, PT_STAR07, 12);
   }
 
 
@@ -236,6 +234,18 @@ functions:
     FLOAT3D vDMStretch = FLOAT3D( 2.0f, 2.0f, 2.0f);
     
     switch (m_EwitType) {
+      case WIT_RANDOM:
+        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+        m_strDescription.PrintF("Random");
+        AddItem(MODEL_CRATE, TEXTURE_CRATE, 0, 0, 0);
+        StretchItem( bDM ?  vDMStretch : FLOAT3D(1.5f, 1.5f, 1.5f));
+        break;
+      case WIT_KNIFE:
+        m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
+        m_strDescription.PrintF("Knife");
+        AddItem(MODEL_KNIFE, TEXTURE_KNIFE, 0, 0, 0);
+        StretchItem( bDM ?  vDMStretch : FLOAT3D(4.0f, 4.0f, 4.0f));
+        break;
     // *********** COLT ***********
       case WIT_COLT:
         m_fRespawnTime = (m_fCustomRespawnTime>0) ? m_fCustomRespawnTime : 10.0f; 
@@ -374,14 +384,95 @@ functions:
         m_strDescription.PrintF("Cannon");
         AddItem(MODEL_CANNON, TEXTURE_CANNON, 0, 0, 0);
         AddItemAttachment(CANNON_ATTACHMENT_BODY, MODEL_CN_BODY, TEXTURE_CANNON, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
-//        AddItemAttachment(CANNON_ATTACHMENT_NUKEBOX, MODEL_CN_NUKEBOX, TEXTURE_CANNON, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
-//        AddItemAttachment(CANNON_ATTACHMENT_LIGHT, MODEL_CN_LIGHT, TEXTURE_CANNON, TEX_REFL_LIGHTMETAL01, TEX_SPEC_MEDIUM, 0);
         StretchItem( bDM ? vDMStretch : (FLOAT3D(3.0f, 3.0f, 3.0f)));
         break;
     }
       // add flare
     AddFlare(MODEL_FLARE, TEXTURE_FLARE, FLOAT3D(0,0.6f,0), FLOAT3D(3,3,0.3f) );
 };
+
+  void MP_Disable(void) {
+    switch (GetSP()->sp_iWeaponItems) {
+      // remove
+      case 0:
+        Destroy();
+        break;
+      // remove only without m_penTarget
+      case 1:
+        if (m_penTarget == NULL) {
+          Destroy();
+        }
+        break;
+    }
+  };
+
+  void RemoveIfPossible(void) {
+    if (!GetSP()->sp_bKnifeItemEnable && m_EwitType==WIT_KNIFE) {
+      MP_Disable();
+    }
+    if (!GetSP()->sp_bChainsawItemEnable && m_EwitType==WIT_CHAINSAW) {
+      MP_Disable();
+    }
+    if (!GetSP()->sp_bColtItemEnable && m_EwitType==WIT_COLT) {
+      MP_Disable();
+    }
+    if (!GetSP()->sp_bShotgunItemEnable && m_EwitType==WIT_SINGLESHOTGUN) {
+      MP_Disable();
+    }
+    if (!GetSP()->sp_bDShotgunItemEnable && m_EwitType==WIT_DOUBLESHOTGUN) {
+      MP_Disable();
+    }
+    if (!GetSP()->sp_bTommygunItemEnable && m_EwitType==WIT_TOMMYGUN) {
+      MP_Disable();
+    }
+    if (!GetSP()->sp_bMinigunItemEnable && m_EwitType==WIT_MINIGUN) {
+      MP_Disable();
+    }
+    if (!GetSP()->sp_bRLauncherItemEnable && m_EwitType==WIT_ROCKETLAUNCHER) {
+      MP_Disable();
+    }
+    if (!GetSP()->sp_bGLauncherItemEnable && m_EwitType==WIT_GRENADELAUNCHER) {
+      MP_Disable();
+    }
+    if (!GetSP()->sp_bFlamerItemEnable && m_EwitType==WIT_FLAMER) {
+      MP_Disable();
+    }
+    if (!GetSP()->sp_bSniperItemEnable && m_EwitType==WIT_SNIPER) {
+      MP_Disable();
+    }
+    if (!GetSP()->sp_bLaserItemEnable && m_EwitType==WIT_LASER) {
+      MP_Disable();
+    }
+    if (!GetSP()->sp_bCannonItemEnable && m_EwitType==WIT_CANNON) {
+      MP_Disable();
+    }
+  };
+
+  void AdjustDifficulty(void) {
+    switch (GetSP()->sp_iWeaponItems) {
+      // randomize and then delete if disabled
+      case 4:
+        if (!m_bRandomizer) {
+          m_EwitType = WIT_RANDOM;
+          m_bRandomizer = TRUE;
+          Reinitialize();
+        } else {
+          RemoveIfPossible();
+        }
+        break;
+      // delete all or leave only with 'target'
+      case 0: case 1:
+        RemoveIfPossible();
+        break;
+      // replace all with a specific one
+      case 3:
+        if (m_EwitType != (WeaponItemType)GetSP()->sp_iReplaceWIT) {
+          m_EwitType = (WeaponItemType)GetSP()->sp_iReplaceWIT;
+          Reinitialize();
+        }
+        break;
+    }
+  };
 
 procedures:
   ItemCollected(EPass epass) : CItem::ItemCollected {
@@ -418,10 +509,6 @@ procedures:
 
   Main()
   {
-    if ( m_EwitType==WIT_GHOSTBUSTER) {
-      m_EwitType=WIT_LASER;
-    }
-
     Initialize();     // initialize base class
     StartModelAnim(ITEMHOLDER_ANIM_BIGOSCILATION, AOF_LOOPING|AOF_NORESTART);
     ForceCollisionBoxIndexChange(ITEMHOLDER_COLLISION_BOX_BIG);

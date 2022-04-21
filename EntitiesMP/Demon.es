@@ -228,15 +228,17 @@ procedures:
     autowait(1.0f);
 
     // spawn particle effect
-    CPlacement3D plFX=GetPlacement();
-    const FLOATmatrix3D &m = GetRotationMatrix();
-    plFX.pl_PositionVector=plFX.pl_PositionVector+vFireballLaunchPos*m;
-    ESpawnEffect ese;
-    ese.colMuliplier = C_WHITE|CT_OPAQUE;
-    ese.betType = BET_COLLECT_ENERGY;
-    ese.vStretch = FLOAT3D(1.0f, 1.0f, 1.0f);
-    m_penFireFX = CreateEntity(plFX, CLASS_BASIC_EFFECT);
-    m_penFireFX->Initialize(ese);
+    if (GetSP()->sp_bEffects) {
+      CPlacement3D plFX=GetPlacement();
+      const FLOATmatrix3D &m = GetRotationMatrix();
+      plFX.pl_PositionVector=plFX.pl_PositionVector+vFireballLaunchPos*m;
+      ESpawnEffect ese;
+      ese.colMuliplier = C_WHITE|CT_OPAQUE;
+      ese.betType = BET_COLLECT_ENERGY;
+      ese.vStretch = FLOAT3D(1.0f, 1.0f, 1.0f);
+      m_penFireFX = CreateEntity(plFX, CLASS_BASIC_EFFECT);
+      m_penFireFX->Initialize(ese);
+    }
 
     autowait(1.4f);
     

@@ -69,7 +69,7 @@ functions:
   void RenderParticles(void)
   {
     // no particles when not existing or in DM modes
-    if (GetRenderType()!=CEntity::RT_MODEL || GetSP()->sp_gmGameMode>CSessionProperties::GM_COOPERATIVE
+    if (GetRenderType()!=CEntity::RT_MODEL || !(GetSP()->sp_bCooperative)
       || !ShowItemParticles())
     {
       return;

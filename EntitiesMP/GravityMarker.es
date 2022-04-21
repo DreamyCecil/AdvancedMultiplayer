@@ -1,6 +1,7 @@
 212
 %{
 #include "StdH.h"
+#include "EntitiesMP\\Player.h"
 %}
 
 uses "EntitiesMP/Marker";

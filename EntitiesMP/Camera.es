@@ -463,11 +463,31 @@ procedures:
     m_bMoving = FALSE;
     ECameraStart eStart;
     eStart.penCamera = this;
-    m_penPlayer->SendEvent(eStart);
+    // [Cecil] Send this camera to everyone in coop
+    if (!SingleOnlyWorld(this)) {
+      m_penPlayer->SendEvent(eStart);
+    } else {
+      for (INDEX iPl = 0; iPl < GetMaxPlayers(); iPl++) {
+        CEntity *penPl = GetPlayerEntity(iPl);
+        if (penPl != NULL && !(penPl->GetFlags()&ENF_DELETED)) {
+          penPl->SendEvent(eStart);
+        }
+      }
+    }
     autowait(m_tmTime);
     ECameraStop eStop;
     eStop.penCamera=this;
-    m_penPlayer->SendEvent(eStop);
+    // [Cecil] Send this camera to everyone in coop
+    if (!SingleOnlyWorld(this)) {
+      m_penPlayer->SendEvent(eStop);
+    } else {
+      for (INDEX iPl = 0; iPl < GetMaxPlayers(); iPl++) {
+        CEntity *penPl = GetPlayerEntity(iPl);
+        if (penPl != NULL && !(penPl->GetFlags()&ENF_DELETED)) {
+          penPl->SendEvent(eStop);
+        }
+      }
+    }
     return;
   }
 
@@ -479,13 +499,35 @@ procedures:
     m_bMoving = TRUE;
     ECameraStart eStart;
     eStart.penCamera = this;
-    m_penPlayer->SendEvent(eStart);
+    // [Cecil] Send this camera to everyone in coop
+    if (!SingleOnlyWorld(this) || m_penTarget == NULL) {
+      m_penPlayer->SendEvent(eStart);
+    } else {
+      for (INDEX iPl = 0; iPl < GetMaxPlayers(); iPl++) {
+        CEntity *penPl = GetPlayerEntity(iPl);
+        if (penPl != NULL && !(penPl->GetFlags()&ENF_DELETED)) {
+          penPl->SendEvent(eStart);
+        }
+      }
+    }
+
     // roll, baby, roll ...
     wait() {
       on( EStop) : {
         ECameraStop eStop;
         eStop.penCamera=this;
-        m_penPlayer->SendEvent(eStop);
+        // [Cecil] Send this camera to everyone in coop
+        if (!SingleOnlyWorld(this) || m_penTarget == NULL) {
+          m_penPlayer->SendEvent(eStop);
+        } else {
+          for (INDEX iPl = 0; iPl < GetMaxPlayers(); iPl++) {
+            CEntity *penPl = GetPlayerEntity(iPl);
+            if (penPl != NULL && !(penPl->GetFlags()&ENF_DELETED)) {
+              penPl->SendEvent(eStop);
+            }
+          }
+        }
+
         if( m_penAutoCameraEndTarget!=NULL)
         {
           SendToTarget(m_penAutoCameraEndTarget, m_eetAutoCameraEndEvent, m_penPlayer);
@@ -505,7 +547,17 @@ procedures:
     // init camera
     ECameraStart eStart;
     eStart.penCamera = this;
-    m_penPlayer->SendEvent(eStart);
+    // [Cecil] Send this camera to everyone in coop
+    if (!SingleOnlyWorld(this) || m_penTarget == NULL) {
+      m_penPlayer->SendEvent(eStart);
+    } else {
+      for (INDEX iPl = 0; iPl < GetMaxPlayers(); iPl++) {
+        CEntity *penPl = GetPlayerEntity(iPl);
+        if (penPl != NULL && !(penPl->GetFlags()&ENF_DELETED)) {
+          penPl->SendEvent(eStart);
+        }
+      }
+    }
 
     // check all markers for correct type and numbers
     INDEX ctMarkers=1;
@@ -568,7 +620,17 @@ procedures:
       on( EStop) : {
         ECameraStop eStop;
         eStop.penCamera=this;
-        m_penPlayer->SendEvent(eStop);
+        // [Cecil] Send this camera to everyone in coop
+        if (!SingleOnlyWorld(this) || m_penTarget == NULL) {
+          m_penPlayer->SendEvent(eStop);
+        } else {
+          for (INDEX iPl = 0; iPl < GetMaxPlayers(); iPl++) {
+            CEntity *penPl = GetPlayerEntity(iPl);
+            if (penPl != NULL && !(penPl->GetFlags()&ENF_DELETED)) {
+              penPl->SendEvent(eStop);
+            }
+          }
+        }
         return;
       }
       otherwise() : {

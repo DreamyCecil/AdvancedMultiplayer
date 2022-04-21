@@ -73,12 +73,6 @@ components:
  57 sound   SOUND_ATTACKKAMIKAZE    "Models\\Enemies\\Headman\\Sounds\\AttackKamikaze.wav",
  58 sound   SOUND_DEATH             "Models\\Enemies\\Headman\\Sounds\\Death.wav",
 
- /*
- 60 model     MODEL_HEADMAN_BODY   "Models\\Enemies\\Headman\\Debris\\Torso.mdl",
- 61 model     MODEL_HEADMAN_HAND   "Models\\Enemies\\Headman\\Debris\\Arm.mdl",
- 62 model     MODEL_HEADMAN_LEGS   "Models\\Enemies\\Headman\\Debris\\Leg.mdl",
- */
-
 functions:
   // describe how this enemy killed player
   virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const EDeath &eDeath)
@@ -128,14 +122,17 @@ functions:
     case HDT_FIRECRACKER: { 
       PrecacheSound(SOUND_FIREFIRECRACKER);
       PrecacheClass(CLASS_PROJECTILE, PRT_HEADMAN_FIRECRACKER);
+      PrecacheClass(CLASS_PROJECTILE, PRT_LARVA_TAIL_PROJECTILE);
                           } break;
     case HDT_ROCKETMAN:   {  
       PrecacheSound(SOUND_FIREROCKETMAN);
       PrecacheClass(CLASS_PROJECTILE, PRT_HEADMAN_ROCKETMAN);
+      PrecacheClass(CLASS_PROJECTILE, PRT_STONEMAN_FIRE);
                           } break;
     case HDT_BOMBERMAN:   {  
       PrecacheSound(SOUND_FIREBOMBERMAN);
       PrecacheClass(CLASS_PROJECTILE, PRT_HEADMAN_BOMBERMAN);
+      PrecacheClass(CLASS_PROJECTILE, PRT_GRENADE);
       PrecacheModel(MODEL_BOMB);
       PrecacheTexture(TEXTURE_BOMB);  
                           } break;
@@ -339,52 +336,6 @@ functions:
     }
   };
 
-  // spawn body parts
-  /*void BlowUp(void)
-  {
-    if( m_hdtType==HDT_FIRECRACKER || m_hdtType==HDT_ROCKETMAN)
-    {
-      // get your size
-      FLOATaabbox3D box;
-      GetBoundingBox(box);
-      FLOAT fEntitySize = box.Size().MaxNorm();
-
-      FLOAT3D vNormalizedDamage = m_vDamage-m_vDamage*(m_fBlowUpAmount/m_vDamage.Length());
-      vNormalizedDamage /= Sqrt(vNormalizedDamage.Length());
-
-      vNormalizedDamage *= 0.75f;
-
-      FLOAT3D vBodySpeed = en_vCurrentTranslationAbsolute-en_vGravityDir*(en_vGravityDir%en_vCurrentTranslationAbsolute);
-
-      // spawn debris
-      Debris_Begin(EIBT_FLESH, DPT_BLOODTRAIL, BET_BLOODSTAIN, fEntitySize, vNormalizedDamage, vBodySpeed, 5.0f, 2.0f);
-
-      INDEX iTextureID = TEXTURE_ROCKETMAN;
-      if( m_hdtType==HDT_FIRECRACKER)
-      {
-        iTextureID = TEXTURE_FIRECRACKER;
-      }
-
-      Debris_Spawn(this, this, MODEL_HEADMAN_BODY, iTextureID, 0, 0, 0, 0, 0.0f,
-        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-      Debris_Spawn(this, this, MODEL_HEADMAN_HAND, iTextureID, 0, 0, 0, 0, 0.0f,
-        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-      Debris_Spawn(this, this, MODEL_HEADMAN_HAND, iTextureID, 0, 0, 0, 0, 0.0f,
-        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-      Debris_Spawn(this, this, MODEL_HEADMAN_LEGS, iTextureID, 0, 0, 0, 0, 0.0f,
-        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-
-      // hide yourself (must do this after spawning debris)
-      SwitchToEditorModel();
-      SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
-      SetCollisionFlags(ECF_IMMATERIAL);
-    }
-    else
-    {
-      CEnemyBase::BlowUp();
-    }
-  };*/
-
   // bomberman and kamikaze explode only once
   void Explode(void) {
     if (!m_bExploded) {
@@ -412,15 +363,17 @@ functions:
       eSpawnEffect.vStretch = FLOAT3D(1.0f,1.0f,1.0f);
       penExplosion->Initialize(eSpawnEffect);
 
-      // explosion debris
-      eSpawnEffect.betType = BET_EXPLOSION_DEBRIS;
-      CEntityPointer penExplosionDebris = CreateEntity(plExplosion, CLASS_BASIC_EFFECT);
-      penExplosionDebris->Initialize(eSpawnEffect);
+      if (GetSP()->sp_bEffects) {
+        // explosion debris
+        eSpawnEffect.betType = BET_EXPLOSION_DEBRIS;
+        CEntityPointer penExplosionDebris = CreateEntity(plExplosion, CLASS_BASIC_EFFECT);
+        penExplosionDebris->Initialize(eSpawnEffect);
 
-      // explosion smoke
-      eSpawnEffect.betType = BET_EXPLOSION_SMOKE;
-      CEntityPointer penExplosionSmoke = CreateEntity(plExplosion, CLASS_BASIC_EFFECT);
-      penExplosionSmoke->Initialize(eSpawnEffect);
+        // explosion smoke
+        eSpawnEffect.betType = BET_EXPLOSION_SMOKE;
+        CEntityPointer penExplosionSmoke = CreateEntity(plExplosion, CLASS_BASIC_EFFECT);
+        penExplosionSmoke->Initialize(eSpawnEffect);
+      }
     }
   };
 
@@ -454,6 +407,14 @@ functions:
       return CEnemyBase::GetAttackMoveFrequency(fEnemyDistance);
     }
   }
+
+  void FirecrackerFireFunc(ANGLE3D aAngle) {
+    if (GetSP()->sp_bStrongerEnemies) {
+      ShootProjectile(PRT_LARVA_TAIL_PROJECTILE, FLOAT3D(0.0f, 0.5f, 0.0f), aAngle);
+    } else {
+      ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f), aAngle);
+    }
+  };
 
 procedures:
 /************************************************************
@@ -527,6 +488,9 @@ procedures:
     ELaunchProjectile eLaunch;
     eLaunch.penLauncher = this;
     eLaunch.prtType = PRT_HEADMAN_BOMBERMAN;
+    if (GetSP()->sp_bStrongerEnemies) {
+      eLaunch.prtType = PRT_GRENADE;
+    }
     eLaunch.fSpeed = fLaunchSpeed;
     penProjectile->Initialize(eLaunch);
 
@@ -550,19 +514,19 @@ procedures:
     autowait(0.15f);
     PlaySound(m_soSound, SOUND_FIREFIRECRACKER, SOF_3D);
     autowait(0.52f);
-    ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f), ANGLE3D(-16.0f, 0, 0));
+    FirecrackerFireFunc(ANGLE3D(-16.0f, 0, 0));
 
     autowait(0.05f);
-    ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f), ANGLE3D(-8, 0, 0));
+    FirecrackerFireFunc(ANGLE3D(-8, 0, 0));
 
     autowait(0.05f);
-    ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f), ANGLE3D(0.0f, 0, 0));
+    FirecrackerFireFunc(ANGLE3D(0.0f, 0, 0));
 
     autowait(0.05f);
-    ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f), ANGLE3D(8.0f, 0, 0));
+    FirecrackerFireFunc(ANGLE3D(8.0f, 0, 0));
 
     autowait(0.05f);
-    ShootProjectile(PRT_HEADMAN_FIRECRACKER, FLOAT3D(0.0f, 0.5f, 0.0f), ANGLE3D(16.0f, 0, 0));
+    FirecrackerFireFunc(ANGLE3D(16.0f, 0, 0));
 
     autowait(0.5f + FRnd()/3);
     return EEnd();
@@ -574,7 +538,11 @@ procedures:
     autowait(0.2f + FRnd()/4);
 
     StartModelAnim(HEADMAN_ANIM_ROCKETMAN_ATTACK, 0);
-    ShootProjectile(PRT_HEADMAN_ROCKETMAN, FLOAT3D(0.0f, 1.0f, 0.0f), ANGLE3D(0, 0, 0));
+    if (GetSP()->sp_bStrongerEnemies) {
+      ShootProjectile(PRT_STONEMAN_FIRE, FLOAT3D(0.0f, 1.0f, 0.0f), ANGLE3D(0, 0, 0));
+    } else {
+      ShootProjectile(PRT_HEADMAN_ROCKETMAN, FLOAT3D(0.0f, 1.0f, 0.0f), ANGLE3D(0, 0, 0));
+    }
     PlaySound(m_soSound, SOUND_FIREROCKETMAN, SOF_3D);
 
     autowait(1.0f + FRnd()/3);

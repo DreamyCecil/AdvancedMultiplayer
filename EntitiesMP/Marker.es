@@ -1,6 +1,12 @@
 202
 %{
 #include "StdH.h"
+
+static EntityInfo eiMarker = {
+  EIBT_AIR, 1000.0f,
+  0.0f, 0.0f, 0.0f,     // source (eyes)
+  0.0f, 0.5f, 0.0f,     // target (body)
+};
 %}
 
 class CMarker: CEntity {
@@ -31,6 +37,10 @@ functions:
     }
     return m_strDescription;
   }
+
+  void *GetEntityInfo(void) {
+    return &eiMarker;
+  };
 
   /* Check if entity is moved on a route set up by its targets. */
   BOOL MovesByTargetedRoute(CTString &strTargetProperty) const {

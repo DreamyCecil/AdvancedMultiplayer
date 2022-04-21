@@ -286,6 +286,9 @@ DECL_DLL FLOAT GetSeriousDamageMultiplier( CEntity *pen);
 // get current world settings controller
 DECL_DLL class CWorldSettingsController *GetWSC(CEntity *pen);
 
+// [Cecil]
+DECL_DLL BOOL SingleOnlyWorld(CEntity *pen);
+
 // helper functions
 
 // distance between two entities

@@ -69,7 +69,6 @@ components:
   5 model   MODEL_SCORPMAN    "Models\\Enemies\\Scorpman\\Scorpman.mdl",
   6 texture TEXTURE_SOLDIER   "Models\\Enemies\\Scorpman\\Soldier.tex",
   7 texture TEXTURE_GENERAL   "Models\\Enemies\\Scorpman\\General.tex",
-//  8 texture TEXTURE_MONSTER   "Models\\Enemies\\Scorpman\\Monster.tex",
  12 texture TEXTURE_SPECULAR  "Models\\SpecularTextures\\Medium.tex",
   9 model   MODEL_GUN         "Models\\Enemies\\Scorpman\\Gun.mdl",
  10 model   MODEL_FLARE       "Models\\Enemies\\Scorpman\\Flare.mdl",

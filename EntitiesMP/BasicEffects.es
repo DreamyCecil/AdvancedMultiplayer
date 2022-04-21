@@ -972,11 +972,18 @@ functions:
     ModelChangeNotify();
 
     SetNormalWithRandomBanking();
-    m_fWaitTime = 2.0f;
-    m_fFadeTime = 2.0f;
     m_bLightSource = FALSE;
     m_eptType = EPT_BULLET_SAND;
     FLOAT3D vTemp = m_vStretch;
+    if (GetSP()->sp_bEffects) {
+      m_fWaitTime = 2.0f;
+      m_fFadeTime = 2.0f;
+    } else {
+      m_fWaitTime = 0.1f;
+      m_fFadeTime = 0.1f;
+      GetModelObject()->StretchModel(FLOAT3D(0,0,0));
+      ModelChangeNotify();
+    }
     ParentToNearestPolygonAndStretch();
     m_vStretch = vTemp;
   }
@@ -998,11 +1005,18 @@ functions:
     moHole.mo_colBlendColor = 0x805030FF;
 
     SetNormalWithRandomBanking();
-    m_fWaitTime = 2.0f;
-    m_fFadeTime = 2.0f;
     m_bLightSource = FALSE;
     m_eptType = EPT_BULLET_RED_SAND;
     FLOAT3D vTemp = m_vStretch;
+    if (GetSP()->sp_bEffects) {
+      m_fWaitTime = 2.0f;
+      m_fFadeTime = 2.0f;
+    } else {
+      m_fWaitTime = 0.1f;
+      m_fFadeTime = 0.1f;
+      GetModelObject()->StretchModel(FLOAT3D(0,0,0));
+      ModelChangeNotify();
+    }
     ParentToNearestPolygonAndStretch();
     m_vStretch = vTemp;
   }
@@ -1018,8 +1032,6 @@ functions:
     SetModel(MODEL_BULLET_STAIN);
     SetModelMainTexture(TEXTURE_BULLET_STAIN);
     SetNormalWithRandomBanking();
-    m_fWaitTime = 2.0f;
-    m_fFadeTime = 2.0f;
     m_bLightSource = FALSE;
     if( bSmoke)
     {
@@ -1030,6 +1042,15 @@ functions:
       m_eptType = EPT_BULLET_UNDER_WATER;
     }
     FLOAT3D vTemp = m_vStretch;
+    if (GetSP()->sp_bEffects) {
+      m_fWaitTime = 2.0f;
+      m_fFadeTime = 2.0f;
+    } else {
+      m_fWaitTime = 0.1f;
+      m_fFadeTime = 0.1f;
+      GetModelObject()->StretchModel(FLOAT3D(0,0,0));
+      ModelChangeNotify();
+    }
     ParentToNearestPolygonAndStretch();
     m_vStretch = vTemp;
   }
@@ -1052,8 +1073,15 @@ functions:
 
     SetNormalWithRandomBanking();
     FindGravityVectorFromSector();
-    m_fWaitTime = 0.5f;
-    m_fFadeTime = 0.5f;
+    if (GetSP()->sp_bEffects) {
+      m_fWaitTime = 0.5f;
+      m_fFadeTime = 0.5f;
+    } else {
+      m_fWaitTime = 0.1f;
+      m_fFadeTime = 0.1f;
+      GetModelObject()->StretchModel(FLOAT3D(0,0,0));
+      ModelChangeNotify();
+    }
     m_bLightSource = FALSE;
     m_tmWaitAfterDeath = 1.0f;
     m_eptType = EPT_BULLET_WATER;
@@ -1086,11 +1114,18 @@ functions:
     moHole.mo_colBlendColor = 0x80f080FF;
 
     SetNormalWithRandomBanking();
-    m_fWaitTime = 2.0f;
-    m_fFadeTime = 2.0f;
     m_bLightSource = FALSE;
     m_eptType = EPT_BULLET_GRASS;
     FLOAT3D vTemp = m_vStretch;
+    if (GetSP()->sp_bEffects) {
+      m_fWaitTime = 2.0f;
+      m_fFadeTime = 2.0f;
+    } else {
+      m_fWaitTime = 0.1f;
+      m_fFadeTime = 0.1f;
+      GetModelObject()->StretchModel(FLOAT3D(0,0,0));
+      ModelChangeNotify();
+    }
     ParentToNearestPolygonAndStretch();
     m_vStretch = vTemp;
   };
@@ -1111,11 +1146,18 @@ functions:
     moHole.mo_colBlendColor = 0xffc080FF;
 
     SetNormalWithRandomBanking();
-    m_fWaitTime = 2.0f;
-    m_fFadeTime = 2.0f;
     m_bLightSource = FALSE;
     m_eptType = EPT_BULLET_WOOD;
     FLOAT3D vTemp = m_vStretch;
+    if (GetSP()->sp_bEffects) {
+      m_fWaitTime = 2.0f;
+      m_fFadeTime = 2.0f;
+    } else {
+      m_fWaitTime = 0.1f;
+      m_fFadeTime = 0.1f;
+      GetModelObject()->StretchModel(FLOAT3D(0,0,0));
+      ModelChangeNotify();
+    }
     ParentToNearestPolygonAndStretch();
     m_vStretch = vTemp;
   };
@@ -1136,11 +1178,18 @@ functions:
     moHole.mo_colBlendColor = 0x7f7f7fFF;
 
     SetNormalWithRandomBanking();
-    m_fWaitTime = 2.0f;
-    m_fFadeTime = 2.0f;
     m_bLightSource = FALSE;
     m_eptType = EPT_BULLET_SNOW;
     FLOAT3D vTemp = m_vStretch;
+    if (GetSP()->sp_bEffects) {
+      m_fWaitTime = 2.0f;
+      m_fFadeTime = 2.0f;
+    } else {
+      m_fWaitTime = 0.1f;
+      m_fFadeTime = 0.1f;
+      GetModelObject()->StretchModel(FLOAT3D(0,0,0));
+      ModelChangeNotify();
+    }
     ParentToNearestPolygonAndStretch();
     m_vStretch = vTemp;
   };

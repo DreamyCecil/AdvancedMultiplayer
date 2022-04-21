@@ -103,6 +103,8 @@ functions:
   // explode only once
   void Explode(void)
   {
+	if (!GetSP()->sp_bEffects) { return; }
+
     if (!m_bExploded)
     {
       m_bExploded = TRUE;
@@ -162,8 +164,10 @@ functions:
         ese.vNormal    = FLOAT3D( vPlaneNormal);
         ese.vDirection = FLOAT3D( 0, 0, 0);
         FLOAT3D vPos = vPoint+ese.vNormal/50.0f*(FRnd()+0.5f);
-        CEntityPointer penEffect = CreateEntity( CPlacement3D(vPos, ANGLE3D(0,0,0)), CLASS_BASIC_EFFECT);
-        penEffect->Initialize(ese);
+        if (GetSP()->sp_bEffects) {
+          CEntityPointer penEffect = CreateEntity( CPlacement3D(vPos, ANGLE3D(0,0,0)), CLASS_BASIC_EFFECT);
+          penEffect->Initialize(ese);
+        }
       }
     }
   };
@@ -277,7 +281,7 @@ procedures:
           // we touched player, explode
           else if ( IsDerivedFromClass( etouch.penOther, "Player"))
           {            
-            InflictDirectDamage(etouch.penOther, this, DMT_IMPACT, 10.0f,
+            InflictDirectDamage(etouch.penOther, this, DMT_IMPACT, 10.0f+15.0f*GetSP()->sp_bStrongerEnemies,
               GetPlacement().pl_PositionVector, -en_vGravityDir);
             SetHealth(-10000.0f);
             m_vDamage = FLOAT3D(0,10000,0);

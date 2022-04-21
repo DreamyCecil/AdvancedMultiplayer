@@ -43,7 +43,8 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /YX /c
-# ADD CPP /nologo /G5 /MD /W3 /GX /Zi /Ox /Ot /Og /Oi /Oy- /I "F:\SeriousSam\_SDK\_GlobalIncludes" /I "F:\SeriousSam\SamMods\Mods\<MOD>\Sources" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /Yu"StdH.h" /FD /c
+# ADD CPP /nologo /G5 /MD /W3 /GX /Zi /Ox /Ot /Og /Oi /Oy- /I "$(ENGINE_DIR)\Sources" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /Yu"StdH.h" /FD /c
+# SUBTRACT CPP /Oa /Ow /Gf /Fr
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG" /d "_AFXDLL"
@@ -53,15 +54,14 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 /nologo /subsystem:windows /dll /map /debug /machine:I386 /pdbtype:sept /libpath:"F:\SeriousSam\_SDK\_GlobalIncludes"
-# SUBTRACT LINK32 /pdb:none
-# Begin Custom Build - Copying $(InputName) binaries to F:\SeriousSam\SamMods\Mods\<MOD>\Bin
+# ADD LINK32 /nologo /subsystem:windows /dll /map /debug /machine:I386 /pdbtype:sept /libpath:"$(ENGINE_DIR)\Bin"
+# Begin Custom Build - Copying $(InputName) binaries to $(ENGINE_DIR)\Bin
 InputPath=.\Release\EntitiesMP.dll
 InputName=EntitiesMP
 SOURCE="$(InputPath)"
 
-"F:\SeriousSam\SamMods\Mods\<MOD>\Bin\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy Release\$(InputName).dll F:\SeriousSam\SamMods\Mods\<MOD>\Bin >nul
+"$(ENGINE_DIR)\Bin\$(InputName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy Release\$(InputName).dll $(ENGINE_DIR)\Bin >nul
 
 # End Custom Build
 
@@ -79,7 +79,8 @@ SOURCE="$(InputPath)"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /YX /c
-# ADD CPP /nologo /G5 /MDd /W3 /Gm /GX /Zi /Od /I "F:\SeriousSam\_SDK\_GlobalIncludes" /I "F:\SeriousSam\SamMods\Mods\<MOD>\Sources" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /Yu"StdH.h" /FD /c
+# ADD CPP /nologo /G5 /MDd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /Yu"StdH.h" /FD /c
+# SUBTRACT CPP /Fr
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG" /d "_AFXDLL"
@@ -89,8 +90,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 /nologo /subsystem:windows /dll /map /debug /machine:I386 /out:"Debug/EntitiesMPD.dll" /pdbtype:sept /libpath:"F:\SeriousSam\_SDK\_GlobalIncludes"
-# SUBTRACT LINK32 /pdb:none
+# ADD LINK32 /nologo /subsystem:windows /dll /map /debug /machine:I386 /out:"Debug/EntitiesMPD.dll" /pdbtype:sept
 # Begin Custom Build - Copying $(InputName) binaries to $(ENGINE_DIR)\Bin\Debug
 InputPath=.\Debug\EntitiesMPD.dll
 InputName=EntitiesMPD
@@ -419,7 +419,15 @@ SOURCE=.\FogMarker.cpp
 # Begin Source File
 
 SOURCE=.\GhostBusterRay.cpp
+
+!IF  "$(CFG)" == "EntitiesMP - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "EntitiesMP - Win32 Debug"
+
 # PROP Exclude_From_Build 1
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -6250,7 +6258,25 @@ InputName=Flame
 # Begin Source File
 
 SOURCE=.\GhostBusterRay.es
+
+!IF  "$(CFG)" == "EntitiesMP - Win32 Release"
+
+# Begin Custom Build - EntitiesMP/$(InputName).es
+InputPath=.\GhostBusterRay.es
+InputName=GhostBusterRay
+
+"$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	cd                                                                                                                        ..\  
+	ecc EntitiesMP/$(InputName).es 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "EntitiesMP - Win32 Debug"
+
 # PROP Exclude_From_Build 1
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 

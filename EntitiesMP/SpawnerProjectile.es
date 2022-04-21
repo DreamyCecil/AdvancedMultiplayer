@@ -89,6 +89,8 @@ functions:
   
   void Explode(void)
   {
+    if (!GetSP()->sp_bEffects) { return; }
+
     // spawn explosion
     CPlacement3D plExplosion = GetPlacement();
     CEntityPointer penExplosion = CreateEntity(plExplosion, CLASS_BASIC_EFFECT);
@@ -107,16 +109,6 @@ functions:
     eSpawnEffect.betType = BET_EXPLOSION_SMOKE;
     CEntityPointer penExplosionSmoke = CreateEntity(plExplosion, CLASS_BASIC_EFFECT);
     penExplosionSmoke->Initialize(eSpawnEffect);
-    
-    /*
-    // spawn smoke effect
-    ESpawnEffect ese;
-    ese.colMuliplier = C_WHITE|CT_OPAQUE;
-    ese.betType = BET_CANNON;
-    ese.vStretch = FLOAT3D(1.0f, 1.0f, 1.0f);
-    CEntityPointer penEffect = CreateEntity(this->GetPlacement(), CLASS_BASIC_EFFECT);
-    penEffect->Initialize(ese);
-    */
   };
   
   void RenderParticles(void) {

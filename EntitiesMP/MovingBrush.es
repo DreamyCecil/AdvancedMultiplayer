@@ -955,7 +955,7 @@ procedures:
         // get your size
         FLOATaabbox3D box;
         GetSize(box);
-        if( m_ctDebrises>0)
+        if( m_ctDebrises>0 && GetSP()->sp_iDebris!=0)
         {
           FLOAT fEntitySize = pow(box.Size()(1)*box.Size()(2)*box.Size()(3)/m_ctDebrises, 1.0f/3.0f)*m_fCubeFactor;
           

@@ -1413,3 +1413,9 @@ class CWorldSettingsController *GetWSC(CEntity *pen)
   return pwsc;
 }
 
+BOOL SingleOnlyWorld(CEntity *pen) {
+  return ( (pen->GetWorld()->GetSpawnFlags() & SPF_SINGLEPLAYER)
+       && !(pen->GetWorld()->GetSpawnFlags() & SPF_COOPERATIVE)
+       && !(pen->GetWorld()->GetSpawnFlags() & SPF_DEATHMATCH)
+       && ! GetSP()->sp_bSinglePlayer);
+};

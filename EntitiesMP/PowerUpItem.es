@@ -98,7 +98,7 @@ functions:
     case PUIT_INVULNER:  pes->es_strName += " invulnerability";  break;
     case PUIT_DAMAGE  :  pes->es_strName += " serious damage";   break;
     case PUIT_SPEED   :  pes->es_strName += " serious speed";    break;
-    case PUIT_BOMB    :  pes->es_strName = "Serious Bomb!"; 
+    case PUIT_BOMB    :  pes->es_strName = "Serious Bomb!";
     }
     return TRUE;
   }
@@ -107,7 +107,7 @@ functions:
   void RenderParticles(void)
   {
     // no particles when not existing or in DM modes
-    if( GetRenderType()!=CEntity::RT_MODEL || GetSP()->sp_gmGameMode>CSessionProperties::GM_COOPERATIVE
+    if( GetRenderType()!=CEntity::RT_MODEL || !(GetSP()->sp_bCooperative)
       || !ShowItemParticles()) {
       return;
     }
@@ -183,9 +183,24 @@ functions:
     }
   };
 
+  void AdjustDifficulty(void) {
+    if (m_penTarget == NULL) {
+      if (!GetSP()->sp_bEnableInvisibility && m_puitType==PUIT_INVISIB) {
+        Destroy();
+      }
+      if (!GetSP()->sp_bEnableInvulnerability && m_puitType==PUIT_INVULNER) {
+        Destroy();
+      }
+      if (!GetSP()->sp_bEnableSeriousDamage && m_puitType==PUIT_DAMAGE) {
+        Destroy();
+      }
+      if (!GetSP()->sp_bEnableSeriousSpeed && m_puitType==PUIT_SPEED) {
+        Destroy();
+      }
+    }
+  };
  
 procedures:
-
   ItemCollected( EPass epass) : CItem::ItemCollected
   {
     ASSERT( epass.penOther!=NULL);
@@ -221,7 +236,7 @@ procedures:
           case PUIT_INVISIB:  IFeel_PlayEffect("PU_Invulnerability"); break;
           case PUIT_INVULNER: IFeel_PlayEffect("PU_Invulnerability"); break;
           case PUIT_DAMAGE:   IFeel_PlayEffect("PU_Invulnerability"); break;
-          case PUIT_SPEED:    IFeel_PlayEffect("PU_FastShoes"); break; 
+          case PUIT_SPEED:    IFeel_PlayEffect("PU_FastShoes"); break;
           case PUIT_BOMB:     IFeel_PlayEffect("PU_SeriousBomb"); break; 
         }
       }

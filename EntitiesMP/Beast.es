@@ -104,8 +104,8 @@ functions:
       PrecacheClass(CLASS_PROJECTILE, PRT_BEAST_PROJECTILE);
     } else {
       PrecacheSound(SOUND_DEATHBIG);
-      PrecacheClass(CLASS_PROJECTILE, PRT_BEAST_BIG_PROJECTILE);
     }
+    PrecacheClass(CLASS_PROJECTILE, PRT_BEAST_BIG_PROJECTILE);
   };
 
   /* Entity info */
@@ -310,16 +310,18 @@ procedures:
     }
 
     // spawn dust effect
-    CPlacement3D plFX=GetPlacement();
-    ESpawnEffect ese;
-    ese.colMuliplier = C_WHITE|CT_OPAQUE;
-    ese.vStretch = FLOAT3D(1,1,2)*15.0f;
-    ese.vNormal = FLOAT3D(0,1,0);
-    ese.betType = BET_DUST_FALL;
-    CPlacement3D plSmoke=plFX;
-    plSmoke.pl_PositionVector+=FLOAT3D(0,0.35f*ese.vStretch(2),0);
-    CEntityPointer penFX = CreateEntity(plSmoke, CLASS_BASIC_EFFECT);
-    penFX->Initialize(ese);
+    if (GetSP()->sp_bEffects) {
+      CPlacement3D plFX=GetPlacement();
+      ESpawnEffect ese;
+      ese.colMuliplier = C_WHITE|CT_OPAQUE;
+      ese.vStretch = FLOAT3D(1,1,2)*15.0f;
+      ese.vNormal = FLOAT3D(0,1,0);
+      ese.betType = BET_DUST_FALL;
+      CPlacement3D plSmoke=plFX;
+      plSmoke.pl_PositionVector+=FLOAT3D(0,0.35f*ese.vStretch(2),0);
+      CEntityPointer penFX = CreateEntity(plSmoke, CLASS_BASIC_EFFECT);
+      penFX->Initialize(ese);
+    }
 
     autowait(GetModelObject()->GetAnimLength(BEAST_ANIM_DEATHBIG)-2.3f);
     return EEnd();
@@ -341,7 +343,11 @@ procedures:
       PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
       autowait(0.51f);
 
-      ShootProjectile(PRT_BEAST_PROJECTILE, FLOAT3D( 0.0f, 1.5f*BEAST_STRETCH, 0.0f),
+      ProjectileType iPrt = PRT_BEAST_PROJECTILE;
+      if (GetSP()->sp_bStrongerEnemies) {
+        iPrt = PRT_BEAST_BIG_PROJECTILE;
+      }
+      ShootProjectile(iPrt, FLOAT3D( 0.0f, 1.5f*BEAST_STRETCH, 0.0f),
         ANGLE3D(AngleDeg((FRnd()-0.5)*30.0f), AngleDeg(FRnd()*10.0f), 0));
       autowait(0.3f);
     }

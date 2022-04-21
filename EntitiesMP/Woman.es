@@ -81,6 +81,7 @@ functions:
     PrecacheSound(SOUND_KICK );
     PrecacheSound(SOUND_DEATH);
     PrecacheClass(CLASS_PROJECTILE, PRT_WOMAN_FIRE);
+    PrecacheClass(CLASS_PROJECTILE, PRT_LARVA_PLASMA);
   };
 
   /* Entity info */
@@ -281,7 +282,11 @@ procedures:
     // fire projectile
     StartModelAnim(WOMAN_ANIM_AIRATTACK02, 0);
     autowait(0.6f);
-    ShootProjectile(PRT_WOMAN_FIRE, FIRE_AIR, ANGLE3D(0, 0, 0));
+    if (GetSP()->sp_bStrongerEnemies) {
+      ShootProjectileStretch(PRT_LARVA_PLASMA, FIRE_AIR, ANGLE3D(0, 0, 0), FLOAT3D(0.25f, 0.25f, 0.25f));
+    } else {
+      ShootProjectile(PRT_WOMAN_FIRE, FIRE_AIR, ANGLE3D(0, 0, 0));
+    }
     PlaySound(m_soSound, SOUND_FIRE, SOF_3D);
     autowait(0.6f);
     StandingAnim();

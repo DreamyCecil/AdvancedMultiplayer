@@ -179,7 +179,7 @@ functions:
       pen->Teleport(pl, m_bTelefrag);
 
       // spawn teleport effect
-      if (m_bSpawnEffect) {
+      if (m_bSpawnEffect && GetSP()->sp_bEffects) {
         ESpawnEffect ese;
         ese.colMuliplier = C_WHITE|CT_OPAQUE;
         ese.betType = BET_TELEPORT;
@@ -273,13 +273,12 @@ procedures:
           return EReturn();
         }
       }
+    }
 
-      // wait between two entities in group
-      wait(m_tmSingleWait) {
-        on (EBegin) : { resume; }
-        on (ETimer) : { stop; }
-        otherwise() : { pass; }
-      }
+    wait(m_tmSingleWait) {
+      on (EBegin) : { resume; }
+      on (ETimer) : { stop; }
+      otherwise() : { pass; }
     }
   }
 
@@ -369,13 +368,6 @@ procedures:
         if (m_tmGroupWait>0 && !m_bFirstPass) { autowait(m_tmGroupWait); }
         autocall SpawnGroup() EReturn;
       }
-
-      // if should continue respawning by one
-      /*if (m_estType==EST_RESPAWNERBYONE) {
-        // set group size to 1
-        if (m_tmGroupWait>0 && !m_bFirstPass) { autowait(m_tmGroupWait); }
-        m_ctGroupSize = 1;
-      }*/
 
       // if should continue maintaining group
       if (m_estType==EST_MAINTAINGROUP) {
@@ -482,13 +474,18 @@ procedures:
 
     m_bFirstPass = TRUE;
 
+    autowait(_pTimer->TickQuantum);
+    m_ctTotal *= GetSP()->sp_fEnemyMultiplier;
+    m_tmSingleWait /= ClampDn(GetSP()->sp_fEnemyMultiplier, 1.0f);
+    m_tmGroupWait  /= ClampDn(GetSP()->sp_fEnemyMultiplier, 1.0f);
+
     wait() {
       on(EBegin) : {
         if(m_estType==EST_SIMPLE) {
           call Simple();
         } else if(m_estType==EST_TELEPORTER) {
           call Teleporter();
-        } else if(m_estType==EST_RESPAWNER /*|| m_estType==EST_RESPAWNERBYONE*/
+        } else if(m_estType==EST_RESPAWNER
                || m_estType==EST_TRIGGERED || m_estType==EST_RESPAWNGROUP) {
           call Respawner();
         } else if(m_estType==EST_MAINTAINGROUP) {

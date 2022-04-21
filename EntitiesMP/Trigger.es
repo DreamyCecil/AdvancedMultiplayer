@@ -1,6 +1,8 @@
 205
 %{
 #include "StdH.h"
+#include "EntitiesMP/Player.h"
+
 extern INDEX ent_bReportBrokenChains;
 %}
 
@@ -130,9 +132,20 @@ procedures:
       m_fScore = 0;
     }
     if (m_strMessage!="") {
-      PrintCenterMessage(this, m_penCaused, 
-        TranslateConst(m_strMessage), 
-        m_fMessageTime, m_mssMessageSound);
+      if (SingleOnlyWorld(this)) {
+        for (INDEX i = 0; i < GetMaxPlayers(); i++) {
+          CEntity *pen = GetPlayerEntity(i);
+          if (pen != NULL && !(pen->GetFlags()&ENF_DELETED)) {
+            PrintCenterMessage(this, pen, 
+              TranslateConst(m_strMessage), 
+              m_fMessageTime, m_mssMessageSound);
+          }
+        }
+      } else {
+        PrintCenterMessage(this, m_penCaused, 
+          TranslateConst(m_strMessage), 
+          m_fMessageTime, m_mssMessageSound);
+      }
     }
 
     // if max trig count is used for counting

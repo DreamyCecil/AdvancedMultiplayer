@@ -576,66 +576,6 @@ functions:
     return FALSE;
   }
 
-  /*void CheckRechargerTargets(void) {
-    m_bRechargerExists = FALSE;
-    
-    CEntityPointer *penModel  = &m_penRCModel01;
-    CEntityPointer *penMarker = &m_penRCMarker01;
-
-    for (INDEX i=0; i<4; i++) {
-      // if model pointer is valid and model is not destroyed
-      if (&*penModel[i]) {
-        if (!((*penModel[i]).en_ulFlags&ENF_DELETED)) { 
-          // at least one exists
-          m_bRechargerExists = TRUE;
-        } else if (m_penRechargerTarget==&*penMarker[i]) {
-          m_penRechargerTarget=NULL;
-          penMarker[i] = NULL;  
-        }
-      // otherwise make sure it is not the current recharging target
-      } else if (m_penRechargerTarget==&*penMarker[i]) {
-        m_penRechargerTarget=NULL;
-        penMarker[i] = NULL;  
-      }
-    }
-  }
-
-  BOOL CurrentRechargerExists(void) {
-    if (m_penRechargerTarget) {
-        if (!(m_penRechargerTarget->en_ulFlags&ENF_DELETED)) { return TRUE; };
-    }
-    return FALSE;
-  }
-
-  BOOL FindClosestRecharger(void) {
-    FLOAT fDistance = UpperLimit(1.0f);
-    m_penRechargerTarget = NULL;
-    if (m_penRCMarker01) {
-      if (DistanceTo(this, m_penRCMarker01)<fDistance) {
-        m_penRechargerTarget = m_penRCMarker01;
-        fDistance = DistanceTo(this, m_penRCMarker01);
-      }
-    }
-    if (m_penRCMarker02) {
-      if (DistanceTo(this, m_penRCMarker02)<fDistance) {
-        m_penRechargerTarget = m_penRCMarker02;
-        fDistance = DistanceTo(this, m_penRCMarker02);
-      }
-    }
-    if (m_penRCMarker03) {
-      if (DistanceTo(this, m_penRCMarker03)<fDistance) {
-        m_penRechargerTarget = m_penRCMarker03;
-        fDistance = DistanceTo(this, m_penRCMarker03);
-      }
-    }
-    if (m_penRCMarker04) {
-      if (DistanceTo(this, m_penRCMarker04)<fDistance) {
-        m_penRechargerTarget = m_penRCMarker04;
-      }
-    }
-    return (m_penRechargerTarget==NULL ? FALSE : TRUE);
-  }*/
-
   void RemoveWing(INDEX iArm) {
     // right arm
     if (iArm==ARM_RIGHT) {

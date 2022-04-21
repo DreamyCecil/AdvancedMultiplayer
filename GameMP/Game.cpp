@@ -103,9 +103,84 @@ extern INDEX gam_iStartMode = 0;
 extern CTString gam_strGameSpyExtras = "";
 
 extern INDEX gam_iBlood = 2;     // 0=none, 1=green, 2=red, 3=hippie
-extern INDEX gam_bGibs  = TRUE;   
+extern INDEX gam_bGibs  = TRUE;
 
 extern INDEX gam_bUseExtraEnemies = TRUE;
+
+// [Cecil] Anti-lag Options
+extern INDEX al_iDebris = 2;
+extern INDEX al_bEffects = TRUE;
+
+// [Cecil] Mutators
+extern FLOAT mut_fSpeedMultiplier = 1;
+extern FLOAT mut_fJumpMultiplier = 1;
+extern FLOAT mut_fStartHealth = 100;
+extern FLOAT mut_fMaxHealth = 200;
+extern FLOAT mut_fMaxArmor = 200;
+extern FLOAT mut_fEnemyMultiplier = 1;
+extern FLOAT mut_fFireSpeed = 1;
+extern FLOAT mut_fAmmoMultiplier = 1;
+extern INDEX mut_bEnable = 0;
+extern INDEX mut_bHeatDamage = 1;
+extern INDEX mut_bImpactDamage = 1;
+extern FLOAT mut_fEnemyDamageMp = 1;
+extern FLOAT mut_fPlayerDamageMp = 1;
+extern FLOAT mut_fSelfDamageMp = 1;
+
+// [Cecil] MP Options
+extern INDEX mp_bUseWeaponRemoving = 0;
+extern INDEX mp_bFillAmmo = 0;
+
+extern INDEX mp_bKnifeEnable = 1;
+extern INDEX mp_bChainsawEnable = 0;
+extern INDEX mp_bColtEnable = 1;
+extern INDEX mp_bDColtEnable = 0;
+extern INDEX mp_bShotgunEnable = 0;
+extern INDEX mp_bDShotgunEnable = 0;
+extern INDEX mp_bTommygunEnable = 0;
+extern INDEX mp_bMinigunEnable = 0;
+extern INDEX mp_bRLauncherEnable = 0;
+extern INDEX mp_bGLauncherEnable = 0;
+extern INDEX mp_bFlamerEnable = 0;
+extern INDEX mp_bSniperEnable = 0;
+extern INDEX mp_bLaserEnable = 0;
+extern INDEX mp_bCannonEnable = 0;
+
+extern INDEX mp_iWeaponItems = 5;
+extern INDEX mp_iReplaceWIT = 0;
+
+extern INDEX mp_bKnifeItemEnable = 1;
+extern INDEX mp_bChainsawItemEnable = 1;
+extern INDEX mp_bColtItemEnable = 1;
+extern INDEX mp_bShotgunItemEnable = 1;
+extern INDEX mp_bDShotgunItemEnable = 1;
+extern INDEX mp_bTommygunItemEnable = 1;
+extern INDEX mp_bMinigunItemEnable = 1;
+extern INDEX mp_bRLauncherItemEnable = 1;
+extern INDEX mp_bGLauncherItemEnable = 1;
+extern INDEX mp_bFlamerItemEnable = 1;
+extern INDEX mp_bSniperItemEnable = 1;
+extern INDEX mp_bLaserItemEnable = 1;
+extern INDEX mp_bCannonItemEnable = 1;
+extern INDEX mp_bRocketExplode = 1;
+extern INDEX mp_bTeslaGun = 0;
+extern INDEX mp_bExplosiveLaser = 0;
+extern INDEX mp_bHomingRockets = 0;
+
+extern INDEX mp_bEnableInvulnerability = TRUE;
+extern INDEX mp_bEnableInvisibility = TRUE;
+extern INDEX mp_bEnableSeriousDamage = TRUE;
+extern INDEX mp_bEnableSeriousSpeed = TRUE;
+
+extern INDEX gam_bComboMode = FALSE;
+extern INDEX gam_bInfiniteCombos = FALSE;
+extern INDEX gam_bPrintCombos = TRUE;
+extern INDEX gam_bStrongerEnemies = FALSE;
+
+extern INDEX gam_iIgnoreCollision = FALSE;
+extern INDEX gam_bAutosave = TRUE;
+
+// other
 
 static INDEX hud_iEnableStats = 1;
 static FLOAT hud_fEnableFPS   = 1;
@@ -193,7 +268,7 @@ static void ReportDemoProfile(void)
 #define MAX_SCRIPTSOUNDS 16
 static CSoundObject *_apsoScriptChannels[MAX_SCRIPTSOUNDS] = {0};
 
-static void PlayScriptSound(INDEX iChannel, const CTString &strSound, FLOAT fVolume, FLOAT fPitch, BOOL bLooping)
+extern void PlayScriptSound(INDEX iChannel, const CTString &strSound, FLOAT fVolume, FLOAT fPitch, BOOL bLooping)
 {
   if (iChannel<0 || iChannel>=MAX_SCRIPTSOUNDS) {
     return;
@@ -209,7 +284,8 @@ static void PlayScriptSound(INDEX iChannel, const CTString &strSound, FLOAT fVol
     CPrintF("%s\n", strError);
   }
 }
-static void StopScriptSound(INDEX iChannel)
+
+extern void StopScriptSound(INDEX iChannel)
 {
   if (iChannel<0 || iChannel>=MAX_SCRIPTSOUNDS||_apsoScriptChannels[iChannel]==NULL) {
     return;
@@ -923,6 +999,78 @@ void CGame::InitInternal( void)
   _pShell->DeclareSymbol("persistent user INDEX gam_bAllowArmor      ;", &gam_bAllowArmor      );
   _pShell->DeclareSymbol("persistent user INDEX gam_bInfiniteAmmo    ;", &gam_bInfiniteAmmo    );
   _pShell->DeclareSymbol("persistent user INDEX gam_bRespawnInPlace  ;", &gam_bRespawnInPlace  );
+
+  // [Cecil] Mutators
+  _pShell->DeclareSymbol("persistent user INDEX mut_bEnable;", &mut_bEnable);
+  _pShell->DeclareSymbol("persistent user FLOAT mut_fSpeedMultiplier;", &mut_fSpeedMultiplier);
+  _pShell->DeclareSymbol("persistent user FLOAT mut_fJumpMultiplier;", &mut_fJumpMultiplier);
+  _pShell->DeclareSymbol("persistent user FLOAT mut_fStartHealth;", &mut_fStartHealth);
+  _pShell->DeclareSymbol("persistent user FLOAT mut_fMaxHealth;", &mut_fMaxHealth);
+  _pShell->DeclareSymbol("persistent user FLOAT mut_fMaxArmor;", &mut_fMaxArmor);
+  _pShell->DeclareSymbol("persistent user FLOAT mut_fEnemyMultiplier;", &mut_fEnemyMultiplier);
+  _pShell->DeclareSymbol("persistent user FLOAT mut_fFireSpeed;", &mut_fFireSpeed);
+  _pShell->DeclareSymbol("persistent user FLOAT mut_fAmmoMultiplier;", &mut_fAmmoMultiplier);
+  _pShell->DeclareSymbol("persistent user INDEX mut_bHeatDamage;", &mut_bHeatDamage);
+  _pShell->DeclareSymbol("persistent user INDEX mut_bImpactDamage;", &mut_bImpactDamage);
+  _pShell->DeclareSymbol("persistent user FLOAT mut_fEnemyDamageMp;", &mut_fEnemyDamageMp);
+  _pShell->DeclareSymbol("persistent user FLOAT mut_fPlayerDamageMp;", &mut_fPlayerDamageMp);
+  _pShell->DeclareSymbol("persistent user FLOAT mut_fSelfDamageMp;", &mut_fSelfDamageMp);
+  // [Cecil] MP Options
+  _pShell->DeclareSymbol("persistent user INDEX mp_bUseWeaponRemoving;", &mp_bUseWeaponRemoving);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bFillAmmo;", &mp_bFillAmmo);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bKnifeEnable;", &mp_bKnifeEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bChainsawEnable;", &mp_bChainsawEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bColtEnable;", &mp_bColtEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bDColtEnable;", &mp_bDColtEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bShotgunEnable;", &mp_bShotgunEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bDShotgunEnable;", &mp_bDShotgunEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bTommygunEnable;", &mp_bTommygunEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bMinigunEnable;", &mp_bMinigunEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bRLauncherEnable;", &mp_bRLauncherEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bGLauncherEnable;", &mp_bGLauncherEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bFlamerEnable;", &mp_bFlamerEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bSniperEnable;", &mp_bSniperEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bLaserEnable;", &mp_bLaserEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bCannonEnable;", &mp_bCannonEnable);
+
+  _pShell->DeclareSymbol("persistent user INDEX mp_iWeaponItems;", &mp_iWeaponItems);
+  _pShell->DeclareSymbol("persistent user INDEX mp_iReplaceWIT;", &mp_iReplaceWIT);
+
+  _pShell->DeclareSymbol("persistent user INDEX mp_bKnifeItemEnable;", &mp_bKnifeItemEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bChainsawItemEnable;", &mp_bChainsawItemEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bColtItemEnable;", &mp_bColtItemEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bShotgunItemEnable;", &mp_bShotgunItemEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bDShotgunItemEnable;", &mp_bDShotgunItemEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bTommygunItemEnable;", &mp_bTommygunItemEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bMinigunItemEnable;", &mp_bMinigunItemEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bRLauncherItemEnable;", &mp_bRLauncherItemEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bGLauncherItemEnable;", &mp_bGLauncherItemEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bFlamerItemEnable;", &mp_bFlamerItemEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bSniperItemEnable;", &mp_bSniperItemEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bLaserItemEnable;", &mp_bLaserItemEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bCannonItemEnable;", &mp_bCannonItemEnable);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bRocketExplode;", &mp_bRocketExplode);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bTeslaGun;", &mp_bTeslaGun);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bExplosiveLaser;", &mp_bExplosiveLaser);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bHomingRockets;", &mp_bHomingRockets);
+
+  _pShell->DeclareSymbol("persistent user INDEX mp_bEnableInvulnerability;", &mp_bEnableInvulnerability);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bEnableInvisibility;", &mp_bEnableInvisibility);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bEnableSeriousDamage;", &mp_bEnableSeriousDamage);
+  _pShell->DeclareSymbol("persistent user INDEX mp_bEnableSeriousSpeed;", &mp_bEnableSeriousSpeed);
+
+  _pShell->DeclareSymbol("persistent user INDEX gam_bComboMode;",  &gam_bComboMode);
+  _pShell->DeclareSymbol("persistent user INDEX gam_bInfiniteCombos;",  &gam_bInfiniteCombos);
+  _pShell->DeclareSymbol("persistent user INDEX gam_bPrintCombos;",  &gam_bPrintCombos);
+  _pShell->DeclareSymbol("persistent user INDEX gam_bStrongerEnemies;",  &gam_bStrongerEnemies);
+
+  _pShell->DeclareSymbol("persistent user INDEX gam_iIgnoreCollision;", &gam_iIgnoreCollision);
+  _pShell->DeclareSymbol("persistent user INDEX gam_bAutosave;", &gam_bAutosave);
+  // [Cecil] Anti-lag
+  _pShell->DeclareSymbol("persistent user INDEX al_iDebris;", &al_iDebris);
+  _pShell->DeclareSymbol("persistent user INDEX al_bEffects;", &al_bEffects);
+
+  // ***** [Cecil] Block end *****
 
   _pShell->DeclareSymbol("persistent user INDEX gam_iCredits;", &gam_iCredits);
   _pShell->DeclareSymbol("persistent user FLOAT gam_tmSpawnInvulnerability;", &gam_tmSpawnInvulnerability);
@@ -2718,10 +2866,6 @@ static CTextureObject _toPointer;
 static CTextureObject _toBcgClouds;
 static CTextureObject _toBcgGrid;
 static CTextureObject _toBackdrop;
-static CTextureObject _toSamU;
-static CTextureObject _toSamD;
-static CTextureObject _toLeftU;
-static CTextureObject _toLeftD;
 
 static PIXaabbox2D _boxScreen_SE;
 static PIX _pixSizeI_SE;
@@ -2748,19 +2892,11 @@ void CGame::LCDInit(void)
     _toPointer.SetData_t(CTFILENAME("TexturesMP\\General\\Pointer.tex",));
     _toBcgGrid.SetData_t(CTFILENAME("TexturesMP\\General\\grid.tex"));
     _toBackdrop.SetData_t(CTFILENAME("TexturesMP\\General\\MenuBack.tex"));
-    _toSamU.SetData_t(CTFILENAME("TexturesMP\\General\\SamU.tex"));
-    _toSamD.SetData_t(CTFILENAME("TexturesMP\\General\\SamD.tex"));
-    _toLeftU.SetData_t(CTFILENAME("TexturesMP\\General\\LeftU.tex"));
-    _toLeftD.SetData_t(CTFILENAME("TexturesMP\\General\\LeftD.tex"));
     // force constant textures
     ((CTextureData*)_toBcgClouds.GetData())->Force(TEX_CONSTANT);
     ((CTextureData*)_toPointer  .GetData())->Force(TEX_CONSTANT);
     ((CTextureData*)_toBcgGrid  .GetData())->Force(TEX_CONSTANT);
     ((CTextureData*)_toBackdrop .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toSamU     .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toSamD     .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toLeftU    .GetData())->Force(TEX_CONSTANT);
-    ((CTextureData*)_toLeftD    .GetData())->Force(TEX_CONSTANT);
 
   } catch (char *strError) {
     FatalError("%s\n", strError);
@@ -2820,57 +2956,18 @@ void CGame::LCDScreenBoxOpenRight(COLOR col)
 }
 void CGame::LCDRenderClouds1(void)
 {
-  _pdp_SE->PutTexture(&_toBackdrop, _boxScreen_SE, C_WHITE|255);
-
-  if (!_bPopup) {
-
-    PIXaabbox2D box;
-        
-    // right character - Sam
-    INDEX iSize = 170;
-    INDEX iYU = 120;
-    INDEX iYM = iYU + iSize;
-    INDEX iYB = iYM + iSize;
-    INDEX iXL = 420;
-    INDEX iXR = iXL + iSize*_pdp_SE->dp_fWideAdjustment;
-    
-    box = PIXaabbox2D( PIX2D( iXL*_pdp_SE->GetWidth()/640, iYU*_pdp_SE->GetHeight()/480) ,
-                       PIX2D( iXR*_pdp_SE->GetWidth()/640, iYM*_pdp_SE->GetHeight()/480));
-    _pdp_SE->PutTexture(&_toSamU, box, SE_COL_BLUE_NEUTRAL|255);
-    box = PIXaabbox2D( PIX2D( iXL*_pdp_SE->GetWidth()/640, iYM*_pdp_SE->GetHeight()/480) ,
-                       PIX2D( iXR*_pdp_SE->GetWidth()/640, iYB*_pdp_SE->GetHeight()/480));
-    _pdp_SE->PutTexture(&_toSamD, box, SE_COL_BLUE_NEUTRAL|255);
-
-    iSize = 120;
-    iYU = 0;
-    iYM = iYU + iSize;
-    iYB = iYM + iSize;
-    iXL = -20;
-    iXR = iXL + iSize;
-    box = PIXaabbox2D( PIX2D( iXL*_pdp_SE->GetWidth()/640, iYU*_pdp_SE->GetWidth()/640) ,
-                       PIX2D( iXR*_pdp_SE->GetWidth()/640, iYM*_pdp_SE->GetWidth()/640));
-    _pdp_SE->PutTexture(&_toLeftU, box, SE_COL_BLUE_NEUTRAL|200);
-    box = PIXaabbox2D( PIX2D( iXL*_pdp_SE->GetWidth()/640, iYM*_pdp_SE->GetWidth()/640) ,
-                       PIX2D( iXR*_pdp_SE->GetWidth()/640, iYB*_pdp_SE->GetWidth()/640));
-    _pdp_SE->PutTexture(&_toLeftD, box, SE_COL_BLUE_NEUTRAL|200);
-    iYU = iYB;
-    iYM = iYU + iSize;
-    iYB = iYM + iSize;
-    iXL = -20;
-    iXR = iXL + iSize;
-    box = PIXaabbox2D( PIX2D( iXL*_pdp_SE->GetWidth()/640, iYU*_pdp_SE->GetWidth()/640) ,
-                       PIX2D( iXR*_pdp_SE->GetWidth()/640, iYM*_pdp_SE->GetWidth()/640));
-    _pdp_SE->PutTexture(&_toLeftU, box, SE_COL_BLUE_NEUTRAL|200);
-    box = PIXaabbox2D( PIX2D( iXL*_pdp_SE->GetWidth()/640, iYM*_pdp_SE->GetWidth()/640) ,
-                       PIX2D( iXR*_pdp_SE->GetWidth()/640, iYB*_pdp_SE->GetWidth()/640));
-    _pdp_SE->PutTexture(&_toLeftD, box, SE_COL_BLUE_NEUTRAL|200);
-  
-  }
+  //_pdp_SE->PutTexture(&_toBackdrop, _boxScreen_SE, C_WHITE|255);
 
   MEXaabbox2D boxBcgClouds1;
+
+  TiledTextureSE(_boxScreen_SE, _pdp_SE->GetWidth()/640.0f, 
+    MEX2D(_tmNow_SE*96,0), boxBcgClouds1);
+  _pdp_SE->PutTexture(&_toBackdrop, _boxScreen_SE, boxBcgClouds1, C_WHITE|255);
+
   TiledTextureSE(_boxScreen_SE, 1.2f*_pdp_SE->GetWidth()/640.0f, 
     MEX2D(sin(_tmNow_SE*0.5f)*35,sin(_tmNow_SE*0.7f+1)*21),   boxBcgClouds1);
   _pdp_SE->PutTexture(&_toBcgClouds, _boxScreen_SE, boxBcgClouds1, C_BLACK|_ulA_SE>>2);
+
   TiledTextureSE(_boxScreen_SE, 0.7f*_pdp_SE->GetWidth()/640.0f, 
     MEX2D(sin(_tmNow_SE*0.6f+1)*32,sin(_tmNow_SE*0.8f)*25),   boxBcgClouds1);
   _pdp_SE->PutTexture(&_toBcgClouds, _boxScreen_SE, boxBcgClouds1, C_BLACK|_ulA_SE>>2);

@@ -325,10 +325,12 @@ procedures:
         GetBoundingBox(box);
         FLOAT fEntitySize = box.Size().MaxNorm();
         
-        Debris_Begin(EIBT_ROCK, DPT_NONE, BET_NONE, fEntitySize, FLOAT3D(1.0f,2.0f,3.0f), FLOAT3D(0,0,0), 1.0f, 0.0f);
-        for(INDEX iDebris = 0; iDebris<12; iDebris++) {
-          Debris_Spawn(this, this, MODEL_STONE, TEXTURE_STONE, 0, 0, 0, IRnd()%4, 0.15f,
+        if (GetSP()->sp_iDebris == 2) {
+          Debris_Begin(EIBT_ROCK, DPT_NONE, BET_NONE, fEntitySize, FLOAT3D(1.0f,2.0f,3.0f), FLOAT3D(0,0,0), 1.0f, 0.0f);
+          for(INDEX iDebris = 0; iDebris<12; iDebris++) {
+            Debris_Spawn(this, this, MODEL_STONE, TEXTURE_STONE, 0, 0, 0, IRnd()%4, 0.15f,
             FLOAT3D(FRnd()*0.8f+0.1f, FRnd()*0.8f+0.1f, FRnd()*0.8f+0.1f));
+          }
         }
         Destroy();
         stop;

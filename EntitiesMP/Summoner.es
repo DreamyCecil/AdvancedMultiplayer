@@ -635,13 +635,6 @@ functions:
       CEntityPointer penFX = CreateEntity(plSmoke, CLASS_BASIC_EFFECT);
       penFX->Initialize(ese);
     }
-
-    /*
-    // growing swirl
-    ese.betType = BET_DISAPPEAR_DUST;
-    penFX = CreateEntity(plFX, CLASS_BASIC_EFFECT);
-    penFX->Initialize(ese);
-    */
   }
 
   void SpawnTeleportEffect(void)
@@ -666,13 +659,6 @@ functions:
     ese.colMuliplier = C_CYAN|CT_OPAQUE;
     CEntityPointer penFX4 = CreateEntity(plFX, CLASS_BASIC_EFFECT);
     penFX4->Initialize(ese);
-
-    // explosion smoke
-    /*
-    ese.betType = BET_EXPLOSION_SMOKE;
-    penFX = CreateEntity(plFX, CLASS_BASIC_EFFECT);
-    penFX->Initialize(ese);
-    */
 
     ESpawnEffector eLightning;
     eLightning.eetType = ET_LIGHTNING;
@@ -1019,38 +1005,40 @@ procedures:
     PlaySound(m_soExplosion, SOUND_EXPLODE, SOF_3D);
 
     // spawn debris
-    Debris_Begin(EIBT_FLESH, DPT_BLOODTRAIL, BET_BLOODSTAIN, 1.0f, 
-      FLOAT3D(0.0f, 10.0f, 0.0f), FLOAT3D(0.0f, 0.0f, 0.0f), 5.0f, 2.0f);
-    for (INDEX i=0; i<15; i++) {
+    if (GetSP()->sp_iDebris==2) {
+      Debris_Begin(EIBT_FLESH, DPT_BLOODTRAIL, BET_BLOODSTAIN, 1.0f, 
+        FLOAT3D(0.0f, 10.0f, 0.0f), FLOAT3D(0.0f, 0.0f, 0.0f), 5.0f, 2.0f);
+      for (INDEX i=0; i<15; i++) {
       
-      FLOAT3D vSpeed = FLOAT3D(0.3f+FRnd()*0.1f, 1.0f+FRnd()*0.5f, 0.3f+FRnd()*0.1f)*1.5f*m_fStretch;
-      FLOAT3D vPos = vSpeed + GetPlacement().pl_PositionVector;
-      ANGLE3D aAng = ANGLE3D(FRnd()*360.0f, FRnd()*360.0f, FRnd()*360.0f);
+        FLOAT3D vSpeed = FLOAT3D(0.3f+FRnd()*0.1f, 1.0f+FRnd()*0.5f, 0.3f+FRnd()*0.1f)*1.5f*m_fStretch;
+        FLOAT3D vPos = vSpeed + GetPlacement().pl_PositionVector;
+        ANGLE3D aAng = ANGLE3D(FRnd()*360.0f, FRnd()*360.0f, FRnd()*360.0f);
       
-      vSpeed.Normalize();
-      vSpeed(2) *= vSpeed(2);
+        vSpeed.Normalize();
+        vSpeed(2) *= vSpeed(2);
 
-      CPlacement3D plPos = CPlacement3D (vPos, aAng);
+        CPlacement3D plPos = CPlacement3D (vPos, aAng);
       
-      switch(i%3) {
-      case 0:
-        Debris_Spawn_Independent(this, this, MODEL_DEBRIS01, TEXTURE_SUMMONER, 0, 0, 0, 0, m_fStretch, 
-          plPos, vSpeed*70.0f, aAng);
-        Debris_Spawn_Independent(this, this, MODEL_DEBRIS_FLESH, TEXTURE_DEBRIS_FLESH , 0, 0, 0, 0, m_fStretch*0.33f, 
-          plPos, vSpeed*70.0f, aAng);        
-        break;
-      case 1:
-        Debris_Spawn_Independent(this, this, MODEL_DEBRIS02, TEXTURE_SUMMONER, 0, 0, 0, 0, m_fStretch, 
-          plPos, vSpeed*70.0f, aAng);
-        Debris_Spawn_Independent(this, this, MODEL_DEBRIS_FLESH, TEXTURE_DEBRIS_FLESH , 0, 0, 0, 0, m_fStretch*0.33f, 
-          plPos, vSpeed*70.0f, aAng);        
-        break;
-      case 2:
-        Debris_Spawn_Independent(this, this, MODEL_DEBRIS03, TEXTURE_SUMMONER, 0, 0, 0, 0, m_fStretch, 
-          plPos, vSpeed*70.0f, aAng);
-        Debris_Spawn_Independent(this, this, MODEL_DEBRIS_FLESH, TEXTURE_DEBRIS_FLESH , 0, 0, 0, 0, m_fStretch*0.33f, 
-          plPos, vSpeed*70.0f, aAng);                
-        break;
+        switch(i%3) {
+          case 0:
+            Debris_Spawn_Independent(this, this, MODEL_DEBRIS01, TEXTURE_SUMMONER, 0, 0, 0, 0, m_fStretch, 
+              plPos, vSpeed*70.0f, aAng);
+            Debris_Spawn_Independent(this, this, MODEL_DEBRIS_FLESH, TEXTURE_DEBRIS_FLESH , 0, 0, 0, 0, m_fStretch*0.33f, 
+              plPos, vSpeed*70.0f, aAng);        
+            break;
+          case 1:
+            Debris_Spawn_Independent(this, this, MODEL_DEBRIS02, TEXTURE_SUMMONER, 0, 0, 0, 0, m_fStretch, 
+              plPos, vSpeed*70.0f, aAng);
+            Debris_Spawn_Independent(this, this, MODEL_DEBRIS_FLESH, TEXTURE_DEBRIS_FLESH , 0, 0, 0, 0, m_fStretch*0.33f, 
+              plPos, vSpeed*70.0f, aAng);        
+            break;
+          case 2:
+            Debris_Spawn_Independent(this, this, MODEL_DEBRIS03, TEXTURE_SUMMONER, 0, 0, 0, 0, m_fStretch, 
+              plPos, vSpeed*70.0f, aAng);
+            Debris_Spawn_Independent(this, this, MODEL_DEBRIS_FLESH, TEXTURE_DEBRIS_FLESH , 0, 0, 0, 0, m_fStretch*0.33f, 
+              plPos, vSpeed*70.0f, aAng);                
+            break;
+        }
       }
     }
  

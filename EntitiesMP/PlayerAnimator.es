@@ -561,7 +561,6 @@ functions:
         AddWeaponAttachment(BODY_ATTACHMENT_KNIFE, MODEL_KNIFE,
                             TEXTURE_KNIFE, TEX_REFL_BWRIPLES02, TEX_SPEC_WEAK, 0);
         break;
-
     // *********** DOUBLE COLT ***********
       case WEAPON_DOUBLECOLT:
         AddWeaponAttachment(BODY_ATTACHMENT_COLT_LEFT, MODEL_COLT, TEXTURE_COLTMAIN, 0, 0, 0);
@@ -1246,7 +1245,6 @@ functions:
       INDEX iWeapon = ((CPlayerWeapons&)*(((CPlayer&)*m_penPlayer).m_penWeapons)).m_iCurrentWeapon;
       switch (iWeapon) {
         case WEAPON_NONE:
-          break;
         case WEAPON_KNIFE: case WEAPON_COLT: case WEAPON_DOUBLECOLT: //case WEAPON_PIPEBOMB:
           iAnim += BODY_ANIM_COLT_SWIM_STAND-BODY_ANIM_COLT_STAND;
           break;
@@ -1279,12 +1277,10 @@ functions:
  *                  CHANGE BODY ANIMATION                   *
  ************************************************************/
   // body animation template
-  void BodyAnimationTemplate(INDEX iNone, INDEX iColt, INDEX iShotgun, INDEX iMinigun, ULONG ulFlags) {
+  void BodyAnimationTemplate(INDEX iNone, INDEX iColt, INDEX iShotgun, INDEX iMinigun, INDEX iNone2, ULONG ulFlags) {
     INDEX iWeapon = ((CPlayerWeapons&)*(((CPlayer&)*m_penPlayer).m_penWeapons)).m_iCurrentWeapon;
     switch (iWeapon) {
       case WEAPON_NONE:
-        SetBodyAnimation(iNone, ulFlags);
-        break;
       case WEAPON_KNIFE: case WEAPON_COLT: case WEAPON_DOUBLECOLT: // case WEAPON_PIPEBOMB:
         if (m_bSwim) { iColt += BODY_ANIM_COLT_SWIM_STAND-BODY_ANIM_COLT_STAND; }
         SetBodyAnimation(iColt, ulFlags);
@@ -1306,14 +1302,14 @@ functions:
   // walk
   void BodyWalkAnimation() {
     BodyAnimationTemplate(BODY_ANIM_NORMALWALK, 
-      BODY_ANIM_COLT_STAND, BODY_ANIM_SHOTGUN_STAND, BODY_ANIM_MINIGUN_STAND, 
+      BODY_ANIM_COLT_STAND, BODY_ANIM_SHOTGUN_STAND, BODY_ANIM_MINIGUN_STAND, BODY_ANIM_DEFAULT_ANIMATION,
       AOF_LOOPING|AOF_NORESTART);
   };
 
   // stand
   void BodyStillAnimation() {
-    BodyAnimationTemplate(BODY_ANIM_WAIT, 
-      BODY_ANIM_COLT_STAND, BODY_ANIM_SHOTGUN_STAND, BODY_ANIM_MINIGUN_STAND, 
+    BodyAnimationTemplate(BODY_ANIM_DEFAULT_ANIMATION, 
+      BODY_ANIM_COLT_STAND, BODY_ANIM_SHOTGUN_STAND, BODY_ANIM_MINIGUN_STAND, BODY_ANIM_DEFAULT_ANIMATION,
       AOF_LOOPING|AOF_NORESTART);
   };
 
@@ -1321,8 +1317,8 @@ functions:
   void BodyPushAnimation() {
     m_bAttacking = FALSE;
     m_bChangeWeapon = FALSE;
-    BodyAnimationTemplate(BODY_ANIM_WAIT, 
-      BODY_ANIM_COLT_REDRAW, BODY_ANIM_SHOTGUN_REDRAW, BODY_ANIM_MINIGUN_REDRAW, 0);
+    BodyAnimationTemplate(BODY_ANIM_DEFAULT_ANIMATION, 
+      BODY_ANIM_COLT_REDRAW, BODY_ANIM_SHOTGUN_REDRAW, BODY_ANIM_MINIGUN_REDRAW, BODY_ANIM_DEFAULT_ANIMATION, 0);
     m_bChangeWeapon = TRUE;
   };
 
@@ -1403,8 +1399,8 @@ functions:
 
     // pull weapon
     m_bChangeWeapon = FALSE;
-    BodyAnimationTemplate(BODY_ANIM_WAIT, 
-      BODY_ANIM_COLT_DRAW, BODY_ANIM_SHOTGUN_DRAW, BODY_ANIM_MINIGUN_DRAW, 0);
+    BodyAnimationTemplate(BODY_ANIM_DEFAULT_ANIMATION, 
+      BODY_ANIM_COLT_DRAW, BODY_ANIM_SHOTGUN_DRAW, BODY_ANIM_MINIGUN_DRAW, BODY_ANIM_DEFAULT_ANIMATION, 0);
     INDEX iWeapon = ((CPlayerWeapons&)*(((CPlayer&)*m_penPlayer).m_penWeapons)).m_iCurrentWeapon;
     if (iWeapon!=WEAPON_NONE) {
       m_bChangeWeapon = TRUE;

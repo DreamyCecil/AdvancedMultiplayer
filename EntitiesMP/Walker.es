@@ -74,12 +74,6 @@ components:
  64 sound   SOUND_SERGEANT_DEATH       "Models\\Enemies\\Walker\\Sounds\\Sergeant\\Death.wav",
  65 sound   SOUND_SERGEANT_WALK        "Models\\Enemies\\Walker\\Sounds\\Sergeant\\Walk.wav",
 
- /*
- 70 model   MODEL_WALKER_HEAD1   "Models\\Enemies\\Walker\\Debris\\Head.mdl",
- 71 model   MODEL_WALKER_HEAD2   "Models\\Enemies\\Walker\\Debris\\Head2.mdl",
- 72 model   MODEL_WALKER_LEG     "Models\\Enemies\\Walker\\Debris\\Leg.mdl",
- */
-
 functions:
   // describe how this enemy killed player
   virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const EDeath &eDeath)
@@ -132,6 +126,7 @@ functions:
       PrecacheTexture(TEXTURE_LASER);
       // projectile
       PrecacheClass(CLASS_PROJECTILE, PRT_CYBORG_LASER);
+      PrecacheClass(CLASS_PROJECTILE, PRT_WALKER_LASER);
     }
     else
     {
@@ -242,8 +237,10 @@ functions:
     ELaunchProjectile eLaunch;
     eLaunch.penLauncher = this;
     eLaunch.prtType = PRT_WALKER_ROCKET;
+    eLaunch.fSpeed = 30.0f;
     penProjectile->Initialize(eLaunch);
   };
+
   // fire death laser
   void FireDeathLaser(FLOAT3D &vPos) {
     CPlacement3D plLaser;
@@ -254,10 +251,10 @@ functions:
     ELaunchProjectile eLaunch;
     eLaunch.penLauncher = this;
     eLaunch.prtType = PRT_CYBORG_LASER;
-    penProjectile->Initialize(eLaunch);
+    if (!GetSP()->sp_bStrongerEnemies) {
+      penProjectile->Initialize(eLaunch);
+    }
   };
-
-
 
   // adjust sound and watcher parameters here if needed
   void EnemyPostInit(void) 
@@ -270,40 +267,6 @@ functions:
     m_soFire3.Set3DParameters(160.0f, 50.0f, 1.0f, 1.0f);
     m_soFire4.Set3DParameters(160.0f, 50.0f, 1.0f, 1.0f);
   };
-
-/************************************************************
- *                 BLOW UP FUNCTIONS                        *
- ************************************************************/
-  // spawn body parts
-/*  void BlowUp(void)
-  {
-    // get your size
-    FLOATaabbox3D box;
-    GetBoundingBox(box);
-    FLOAT fEntitySize = box.Size().MaxNorm();
-
-    FLOAT3D vNormalizedDamage = m_vDamage-m_vDamage*(m_fBlowUpAmount/m_vDamage.Length());
-    vNormalizedDamage /= Sqrt(vNormalizedDamage.Length());
-
-    vNormalizedDamage *= 0.75f;
-    FLOAT3D vBodySpeed = en_vCurrentTranslationAbsolute-en_vGravityDir*(en_vGravityDir%en_vCurrentTranslationAbsolute);
-
-    // spawn debris
-    Debris_Begin(EIBT_FLESH, DPT_NONE, BET_NONE, fEntitySize, vNormalizedDamage, vBodySpeed, 5.0f, 2.0f);
-    Debris_Spawn(this, this, MODEL_WALKER_HEAD1, TEXTURE_WALKER_SOLDIER, 0, 0, 0, 0, 0.1250f,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-    Debris_Spawn(this, this, MODEL_WALKER_HEAD2, TEXTURE_WALKER_SOLDIER, 0, 0, 0, 0, 0.125f,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-    Debris_Spawn(this, this, MODEL_WALKER_LEG, TEXTURE_WALKER_SOLDIER, 0, 0, 0, 0, 0.125f,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-    Debris_Spawn(this, this, MODEL_WALKER_LEG, TEXTURE_WALKER_SOLDIER, 0, 0, 0, 0, 0.125f,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-
-    // hide yourself (must do this after spawning debris)
-    SwitchToEditorModel();
-    SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
-    SetCollisionFlags(ECF_IMMATERIAL);
-  };*/
 
 procedures:
 /************************************************************
@@ -330,9 +293,6 @@ procedures:
       StartModelAnim(WALKER_ANIM_FIRELEFT, AOF_LOOPING);
       ShootProjectile(PRT_WALKER_ROCKET, FIRE_LEFT_ARM*m_fSize, ANGLE3D(0, 0, 0));
       PlaySound(m_soFire2, SOUND_SERGEANT_FIRE_ROCKET, SOF_3D);
-
-//      m_fLockOnEnemyTime = 0.25f;
-//      autocall CEnemyBase::LockOnEnemy() EReturn;
     } 
     if (m_EwcChar==WLC_SOLDIER) {
       if (GetSP()->sp_gdGameDifficulty<=CSessionProperties::GD_EASY) {
@@ -343,10 +303,30 @@ procedures:
       while(m_iLoopCounter>0) {
         if (m_iLoopCounter%2) {
           StartModelAnim(WALKER_ANIM_FIRELEFT, AOF_LOOPING);
-          ShootProjectile(PRT_CYBORG_LASER, FIRE_LEFT_ARM*m_fSize, ANGLE3D(0, 0, 0));
+          if (!GetSP()->sp_bStrongerEnemies) {
+            ShootProjectile(PRT_CYBORG_LASER, FIRE_LEFT_ARM*m_fSize, ANGLE3D(0, 0, 0));
+          } else {
+            FLOAT3D vGunPosAbs   = GetPlacement().pl_PositionVector + FIRE_LEFT_ARM*m_fSize;
+            FLOAT3D vEnemySpeed  = ((CMovableEntity&) *m_penEnemy).en_vCurrentTranslationAbsolute;
+            FLOAT3D vEnemyPos    = ((CMovableEntity&) *m_penEnemy).GetPlacement().pl_PositionVector;
+            FLOAT   fLaserSpeed  = 200.0f; // m/s
+            FLOAT3D vPredictedEnemyPosition = CalculatePredictedPosition(vGunPosAbs,
+              vEnemyPos, fLaserSpeed, vEnemySpeed, GetPlacement().pl_PositionVector(2) );
+            ShootPredictedProjectile(PRT_WALKER_LASER, vPredictedEnemyPosition, FIRE_LEFT_ARM*m_fSize, ANGLE3D(0, 0, 0));
+          }
         } else {
           StartModelAnim(WALKER_ANIM_FIRERIGHT, AOF_LOOPING);
-          ShootProjectile(PRT_CYBORG_LASER, FIRE_RIGHT_ARM*m_fSize, ANGLE3D(0, 0, 0));
+          if (!GetSP()->sp_bStrongerEnemies) {
+            ShootProjectile(PRT_CYBORG_LASER, FIRE_RIGHT_ARM*m_fSize, ANGLE3D(0, 0, 0));
+          } else {
+            FLOAT3D vGunPosAbs   = GetPlacement().pl_PositionVector + FIRE_RIGHT_ARM*m_fSize;
+            FLOAT3D vEnemySpeed  = ((CMovableEntity&) *m_penEnemy).en_vCurrentTranslationAbsolute;
+            FLOAT3D vEnemyPos    = ((CMovableEntity&) *m_penEnemy).GetPlacement().pl_PositionVector;
+            FLOAT   fLaserSpeed  = 200.0f; // m/s
+            FLOAT3D vPredictedEnemyPosition = CalculatePredictedPosition(vGunPosAbs,
+              vEnemyPos, fLaserSpeed, vEnemySpeed, GetPlacement().pl_PositionVector(2) );
+            ShootPredictedProjectile(PRT_WALKER_LASER, vPredictedEnemyPosition, FIRE_RIGHT_ARM*m_fSize, ANGLE3D(0, 0, 0));
+          }
         }
         INDEX iChannel = m_iLoopCounter%4;
         if (iChannel==0) {
@@ -431,16 +411,18 @@ procedures:
       fStretch=4.0f;
     }
     // spawn dust effect
-    CPlacement3D plFX=GetPlacement();
-    ESpawnEffect ese;
-    ese.colMuliplier = C_WHITE|CT_OPAQUE;
-    ese.vStretch = FLOAT3D(1.5,1,1)*fStretch;
-    ese.vNormal = FLOAT3D(0,1,0);
-    ese.betType = BET_DUST_FALL;
-    CPlacement3D plSmoke=plFX;
-    plSmoke.pl_PositionVector+=FLOAT3D(0,0.35f*ese.vStretch(2),0);
-    CEntityPointer penFX = CreateEntity(plSmoke, CLASS_BASIC_EFFECT);
-    penFX->Initialize(ese);
+    if (GetSP()->sp_bEffects) {
+      CPlacement3D plFX=GetPlacement();
+      ESpawnEffect ese;
+      ese.colMuliplier = C_WHITE|CT_OPAQUE;
+      ese.vStretch = FLOAT3D(1.5,1,1)*fStretch;
+      ese.vNormal = FLOAT3D(0,1,0);
+      ese.betType = BET_DUST_FALL;
+      CPlacement3D plSmoke=plFX;
+      plSmoke.pl_PositionVector+=FLOAT3D(0,0.35f*ese.vStretch(2),0);
+      CEntityPointer penFX = CreateEntity(plSmoke, CLASS_BASIC_EFFECT);
+      penFX->Initialize(ese);
+    }
 
     autowait(0.35f);
 

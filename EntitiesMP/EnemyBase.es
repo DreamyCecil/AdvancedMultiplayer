@@ -4,6 +4,7 @@
 #include "EntitiesMP/Common/PathFinding.h"
 #include "EntitiesMP/NavigationMarker.h"
 #include "EntitiesMP/TacticsHolder.h"
+#include "EntitiesMP/Player.h"
 extern void JumpFromBouncer(CEntity *penToBounce, CEntity *penBouncer);
 extern INDEX ent_bReportBrokenChains;
 %}
@@ -210,6 +211,53 @@ functions:
   void CEnemyBase(void)
   {
     m_tmPredict = 0;
+  }
+
+  CEntityPointer NearestPlayer(void) {
+	  FLOAT3D vPlayerPosNearest;
+	  CEntityPointer pen_plNearest;
+	  FLOAT fLastPosNearest = 50.0f;
+
+	  FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten)
+	  {
+		  CEntity *pen = iten;
+		  if (IsOfClass(pen, "Player")) {
+			  FLOAT3D vDiff = pen->GetPlacement().pl_PositionVector - GetPlacement().pl_PositionVector;
+			  if (vDiff.Length() < fLastPosNearest) {
+				  fLastPosNearest = vDiff.Length();
+				  vPlayerPosNearest = pen->GetPlacement().pl_PositionVector;
+				  pen_plNearest = pen;
+			  }
+		  }
+	  }
+	  if (pen_plNearest!=NULL && pen_plNearest!=this) {
+		return pen_plNearest;
+	  }
+	  return NULL;
+  }
+
+  CEntityPointer NearestEnemy(void) {
+	  FLOAT3D vPlayerPosNearest;
+	  CEntityPointer pen_plNearest;
+	  FLOAT fLastPosNearest = 50.0f;
+
+	  FOREACHINDYNAMICCONTAINER(GetWorld()->wo_cenEntities, CEntity, iten)
+	  {
+		  CEntity *pen = iten;
+		  if (IsDerivedFromClass(pen, "Enemy Base") && pen!=this && ((CEnemyBase*)&*pen)->m_bTemplate==FALSE
+			  && ((CEnemyBase*)&*pen)->GetHealth() > 0.0f) {
+			  FLOAT3D vDiff = pen->GetPlacement().pl_PositionVector - GetPlacement().pl_PositionVector;
+			  if (vDiff.Length() < fLastPosNearest) {
+				  fLastPosNearest = vDiff.Length();
+				  vPlayerPosNearest = pen->GetPlacement().pl_PositionVector;
+				  pen_plNearest = pen;
+			  }
+		  }
+	  }
+	  if (pen_plNearest!=NULL && pen_plNearest!=this) {
+		return pen_plNearest;
+	  }
+	  return NULL;
   }
 
   // called by other entities to set time prediction parameter
@@ -620,6 +668,14 @@ functions:
       return;
     }
 
+    if (IsDerivedFromClass(penInflictor, "Enemy Base") && GetSP()->sp_bStrongerEnemies && GetFlags()&ENF_ALIVE) {
+       return;
+    }
+
+    if ((dmtType == DMT_HEAT || dmtType == DMT_IMPACT) && GetSP()->sp_bStrongerEnemies) {
+      return;
+    }
+
     FLOAT fNewDamage = fDamageAmmount;
 
     // adjust damage
@@ -715,53 +771,50 @@ functions:
       !(dmtType==DMT_BURNING && GetHealth()<0) ) {
 
       // spawn blood spray
-      CPlacement3D plSpray = CPlacement3D( vHitPoint, ANGLE3D(0, 0, 0));
-      m_penSpray = CreateEntity( plSpray, CLASS_BLOOD_SPRAY);
-      if(m_sptType != SPT_ELECTRICITY_SPARKS)
-      {
-        m_penSpray->SetParent( this);
-      }
+      if (GetSP()->sp_bEffects) {
+        CPlacement3D plSpray = CPlacement3D( vHitPoint, ANGLE3D(0, 0, 0));
+        m_penSpray = CreateEntity( plSpray, CLASS_BLOOD_SPRAY);
+        if(m_sptType != SPT_ELECTRICITY_SPARKS)
+        {
+          m_penSpray->SetParent( this);
+        }
 
-      ESpawnSpray eSpawnSpray;
-      eSpawnSpray.colBurnColor=C_WHITE|CT_OPAQUE;
+        ESpawnSpray eSpawnSpray;
+        eSpawnSpray.colBurnColor=C_WHITE|CT_OPAQUE;
       
-      if( m_fMaxDamageAmmount > 10.0f)
-      {
-        eSpawnSpray.fDamagePower = 3.0f;
-      }
-      else if(m_fSprayDamage+fNewDamage>50.0f)
-      {
-        eSpawnSpray.fDamagePower = 2.0f;
-      }
-      else
-      {
-        eSpawnSpray.fDamagePower = 1.0f;
-      }
+        if( m_fMaxDamageAmmount > 10.0f)
+        {
+          eSpawnSpray.fDamagePower = 3.0f;
+        }
+        else if(m_fSprayDamage+fNewDamage>50.0f)
+        {
+          eSpawnSpray.fDamagePower = 2.0f;
+        }
+        else
+        {
+          eSpawnSpray.fDamagePower = 1.0f;
+        }
 
-      eSpawnSpray.sptType = m_sptType;
-      eSpawnSpray.fSizeMultiplier = 1.0f;
+        eSpawnSpray.sptType = m_sptType;
+        eSpawnSpray.fSizeMultiplier = 1.0f;
 
-      // setup direction of spray
-      FLOAT3D vHitPointRelative = vHitPoint - GetPlacement().pl_PositionVector;
-      FLOAT3D vReflectingNormal;
-      GetNormalComponent( vHitPointRelative, en_vGravityDir, vReflectingNormal);
-      vReflectingNormal.SafeNormalize();
+        // setup direction of spray
+        FLOAT3D vHitPointRelative = vHitPoint - GetPlacement().pl_PositionVector;
+        FLOAT3D vReflectingNormal;
+        GetNormalComponent( vHitPointRelative, en_vGravityDir, vReflectingNormal);
+        vReflectingNormal.SafeNormalize();
       
-      vReflectingNormal(1)/=5.0f;
+        vReflectingNormal(1)/=5.0f;
     
-      FLOAT3D vProjectedComponent = vReflectingNormal*(vDirection%vReflectingNormal);
-      FLOAT3D vSpilDirection = vDirection-vProjectedComponent*2.0f-en_vGravityDir*0.5f;
+        FLOAT3D vProjectedComponent = vReflectingNormal*(vDirection%vReflectingNormal);
+        FLOAT3D vSpilDirection = vDirection-vProjectedComponent*2.0f-en_vGravityDir*0.5f;
 
-      eSpawnSpray.vDirection = vSpilDirection;
-      eSpawnSpray.penOwner = this;
-    
-      /*if (dmtType==DMT_BURNING && GetHealth()<0)
-      {
-        eSpawnSpray.fDamagePower = 1.0f;
-      }*/
+        eSpawnSpray.vDirection = vSpilDirection;
+        eSpawnSpray.penOwner = this;
 
-      // initialize spray
-      m_penSpray->Initialize( eSpawnSpray);
+        // initialize spray
+        m_penSpray->Initialize( eSpawnSpray);
+      }
       m_tmSpraySpawned = _pTimer->CurrentTick();
       m_fSprayDamage = 0.0f;
       m_fMaxDamageAmmount = 0.0f;
@@ -1132,6 +1185,9 @@ functions:
     
     // if we may rotate
     if (m_aRotateSpeed>0.0f) {
+      if (!GetSP()->sp_bStrongerEnemies) {
+        m_aRotateSpeed = 2000.0f;
+      }
       // get desired heading orientation
       FLOAT3D vDir = vDelta;
       vDir.SafeNormalize();
@@ -1640,6 +1696,30 @@ functions:
     return penProjectile;
   };
 
+  CEntity *ShootProjectileStretch(enum ProjectileType pt, FLOAT3D &vOffset, ANGLE3D &aOffset, FLOAT3D &vStretch) {
+    ASSERT(m_penEnemy != NULL);
+
+    // target enemy body
+    EntityInfo *peiTarget = (EntityInfo*) (m_penEnemy->GetEntityInfo());
+    FLOAT3D vShootTarget;
+    GetEntityInfoPosition(m_penEnemy, peiTarget->vTargetCenter, vShootTarget);
+
+    // launch
+    CPlacement3D pl;
+    PreparePropelledProjectile(pl, vShootTarget, vOffset, aOffset);
+    CEntityPointer penProjectile = CreateEntity(pl, CLASS_PROJECTILE);
+    ELaunchProjectile eLaunch;
+    eLaunch.penLauncher = this;
+    eLaunch.fStretch=1.0f;
+    eLaunch.prtType = pt;
+    penProjectile->Initialize(eLaunch);
+
+    penProjectile->GetModelObject()->StretchModel(vStretch);
+    ModelChangeNotify();
+
+    return penProjectile;
+  };
+
   // shoot projectile at an exact spot
   CEntity *ShootProjectileAt(FLOAT3D vShootTarget, enum ProjectileType pt, FLOAT3D &vOffset, ANGLE3D &aOffset) {
   
@@ -1760,20 +1840,22 @@ functions:
       ULONG ulFleshModel   = MODEL_FLESH;
       if( iBloodType==2) { ulFleshTexture = TEXTURE_FLESH_RED; }
       // spawn debris
-      Debris_Begin(EIBT_FLESH, DPT_BLOODTRAIL, BET_BLOODSTAIN, m_fBlowUpSize, vNormalizedDamage, vBodySpeed, 1.0f, 0.0f);
-      for( INDEX iDebris = 0; iDebris<m_fBodyParts; iDebris++) {
-        // flowerpower mode?
-        if( iBloodType==3) {
-          switch( IRnd()%5) {
-          case 1:  { ulFleshModel = MODEL_FLESH_APPLE;   ulFleshTexture = TEXTURE_FLESH_APPLE;   break; }
-          case 2:  { ulFleshModel = MODEL_FLESH_BANANA;  ulFleshTexture = TEXTURE_FLESH_BANANA;  break; }
-          case 3:  { ulFleshModel = MODEL_FLESH_BURGER;  ulFleshTexture = TEXTURE_FLESH_BURGER;  break; }
-          case 4:  { ulFleshModel = MODEL_FLESH_LOLLY;   ulFleshTexture = TEXTURE_FLESH_LOLLY;   break; }
-          default: { ulFleshModel = MODEL_FLESH_ORANGE;  ulFleshTexture = TEXTURE_FLESH_ORANGE;  break; }
+      if (GetSP()->sp_iDebris == 2) {
+        Debris_Begin(EIBT_FLESH, DPT_BLOODTRAIL, BET_BLOODSTAIN, m_fBlowUpSize, vNormalizedDamage, vBodySpeed, 1.0f, 0.0f);
+        for( INDEX iDebris = 0; iDebris<m_fBodyParts; iDebris++) {
+          // flowerpower mode?
+          if( iBloodType==3) {
+            switch( IRnd()%5) {
+            case 1:  { ulFleshModel = MODEL_FLESH_APPLE;   ulFleshTexture = TEXTURE_FLESH_APPLE;   break; }
+            case 2:  { ulFleshModel = MODEL_FLESH_BANANA;  ulFleshTexture = TEXTURE_FLESH_BANANA;  break; }
+            case 3:  { ulFleshModel = MODEL_FLESH_BURGER;  ulFleshTexture = TEXTURE_FLESH_BURGER;  break; }
+            case 4:  { ulFleshModel = MODEL_FLESH_LOLLY;   ulFleshTexture = TEXTURE_FLESH_LOLLY;   break; }
+            default: { ulFleshModel = MODEL_FLESH_ORANGE;  ulFleshTexture = TEXTURE_FLESH_ORANGE;  break; }
+            }
           }
+          Debris_Spawn( this, this, ulFleshModel, ulFleshTexture, 0, 0, 0, IRnd()%4, 0.5f,
+                        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
         }
-        Debris_Spawn( this, this, ulFleshModel, ulFleshTexture, 0, 0, 0, IRnd()%4, 0.5f,
-                      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
       }
       // leave a stain beneath
       LeaveStain(FALSE);
@@ -1782,21 +1864,25 @@ functions:
     // if allowed and robot/machine
     if( bGibs && m_bRobotBlowup)
     {
-      // spawn debris
-      Debris_Begin(EIBT_ROBOT, DPR_SMOKETRAIL, BET_EXPLOSIONSTAIN, m_fBlowUpSize, vNormalizedDamage, vBodySpeed, 1.0f, 0.0f);
-      for( INDEX iDebris = 0; iDebris<m_fBodyParts; iDebris++) {
-        Debris_Spawn( this, this, MODEL_MACHINE, TEXTURE_MACHINE, 0, 0, 0, IRnd()%4, 0.2f,
-                      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
+      if (GetSP()->sp_iDebris == 2) {
+        // spawn debris
+        Debris_Begin(EIBT_ROBOT, DPR_SMOKETRAIL, BET_EXPLOSIONSTAIN, m_fBlowUpSize, vNormalizedDamage, vBodySpeed, 1.0f, 0.0f);
+        for( INDEX iDebris = 0; iDebris<m_fBodyParts; iDebris++) {
+          Debris_Spawn( this, this, MODEL_MACHINE, TEXTURE_MACHINE, 0, 0, 0, IRnd()%4, 0.2f,
+                        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
+        }
       }
       // spawn explosion
-      CPlacement3D plExplosion = GetPlacement();
-      CEntityPointer penExplosion = CreateEntity(plExplosion, CLASS_BASIC_EFFECT);
-      ESpawnEffect eSpawnEffect;
-      eSpawnEffect.colMuliplier = C_WHITE|CT_OPAQUE;
-      eSpawnEffect.betType = BET_BOMB;
-      FLOAT fSize = m_fBlowUpSize*0.3f;
-      eSpawnEffect.vStretch = FLOAT3D(fSize,fSize,fSize);
-      penExplosion->Initialize(eSpawnEffect);
+      if (GetSP()->sp_bEffects) {
+        CPlacement3D plExplosion = GetPlacement();
+        CEntityPointer penExplosion = CreateEntity(plExplosion, CLASS_BASIC_EFFECT);
+        ESpawnEffect eSpawnEffect;
+        eSpawnEffect.colMuliplier = C_WHITE|CT_OPAQUE;
+        eSpawnEffect.betType = BET_BOMB;
+        FLOAT fSize = m_fBlowUpSize*0.3f;
+        eSpawnEffect.vStretch = FLOAT3D(fSize,fSize,fSize);
+        penExplosion->Initialize(eSpawnEffect);
+      }
     }
 
     // hide yourself (must do this after spawning debris)
@@ -1840,8 +1926,10 @@ functions:
         ese.vNormal    = FLOAT3D( vPlaneNormal);
         ese.vDirection = FLOAT3D( 0, 0, 0);
         FLOAT3D vPos = vPoint+ese.vNormal/50.0f*(FRnd()+0.5f);
-        CEntityPointer penEffect = CreateEntity( CPlacement3D(vPos, ANGLE3D(0,0,0)), CLASS_BASIC_EFFECT);
-        penEffect->Initialize(ese);
+        if (GetSP()->sp_bEffects) {
+          CEntityPointer penEffect = CreateEntity( CPlacement3D(vPos, ANGLE3D(0,0,0)), CLASS_BASIC_EFFECT);
+          penEffect->Initialize(ese);
+        }
       }
     }
   };
@@ -2166,45 +2254,7 @@ procedures:
   ReturnToStartPosition(EVoid) 
   {
     jump BeIdle();
-/*
-    // start watching
-    GetWatcher()->SendEvent(EStart());
-
-    m_vDesiredPosition = m_vStartPosition;
-    m_vStartDirection = (GetPlacement().pl_PositionVector-m_vStartPosition).SafeNormalize();
-    m_fMoveSpeed = GetProp(m_fAttackRunSpeed);
-    m_aRotateSpeed = GetProp(m_aAttackRotateSpeed);
-    RunningAnim();
-    autocall MoveToDestination() EReturn;
-
-    WalkingAnim();
-    m_vDesiredAngle = m_vStartDirection;
-    StopTranslating();
-
-    autocall RotateToStartDirection() EReturn;
-
-    StopMoving();
-    StandingAnim();
-
-    jump BeIdle();
-    */
   };
-  /*
-  // rotate to destination
-  RotateToStartDirection(EVoid) 
-  {
-
-    m_fMoveFrequency = 0.1f;
-    m_fMoveTime = _pTimer->CurrentTick() + 45.0f;
-    while (Abs(GetRelativeHeading(GetDesiredPositionDir()))>GetProp(m_aRotateSpeed)*m_fMoveFrequency*1.5f &&
-           m_fMoveTime>_pTimer->CurrentTick()) {
-      autowait(m_fMoveFrequency);
-    }
-
-    return EReturn();
-  };
-  */
-
 
   // move through markers
   MoveThroughMarkers() 
@@ -2886,9 +2936,11 @@ procedures:
           ese.betType = BET_DUST_FALL;
           CPlacement3D plSmoke=plFX;
           plSmoke.pl_PositionVector+=FLOAT3D(0,0.35f*m_vTacticsStartPosition(2),0);
-          CEntityPointer penFX = CreateEntity(plSmoke, CLASS_BASIC_EFFECT);
-          penFX->Initialize(ese);
-          penFX->SetParent(this);
+          if (GetSP()->sp_bEffects) {
+            CEntityPointer penFX = CreateEntity(plSmoke, CLASS_BASIC_EFFECT);
+            penFX->Initialize(ese);
+            penFX->SetParent(this);
+          }
           // mark that we spawned dust
           m_fTacticVar3=1;
         }
@@ -2904,7 +2956,9 @@ procedures:
     autocall Death() EEnd;
 
     // start bloody stain growing out from beneath the corpse
-    LeaveStain(TRUE);
+    if (GetSP()->sp_bEffects) {
+      LeaveStain(TRUE);
+    }
 
     // check if you have attached flame
     CEntityPointer penFlame = GetChildOfClass("Flame");

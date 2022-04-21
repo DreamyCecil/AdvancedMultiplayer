@@ -6,6 +6,7 @@ public:
   enum GameMode {
     GM_FLYOVER = -1,
     GM_COOPERATIVE = 0,
+    GM_SINGLEPLAYER,
     GM_SCOREMATCH,
     GM_FRAGMATCH,
   };
@@ -66,6 +67,76 @@ public:
   ULONG sp_ulLevelsMask;    // mask of visited levels so far
 
   BOOL  sp_bUseExtraEnemies;  // spawn extra multiplayer enemies
+
+  BOOL sp_bComboMode;
+  BOOL sp_bInfiniteCombos;
+  BOOL sp_bPrintCombos;
+  BOOL sp_bStrongerEnemies;
+  INDEX sp_iIgnoreCollision;
+  BOOL sp_bAutosave;
+
+  // [Cecil] Anti-lag Options
+  INDEX sp_iDebris;
+  BOOL  sp_bEffects;
+
+  // [Cecil] Mutators
+  FLOAT sp_fSpeedMultiplier;
+  FLOAT sp_fJumpMultiplier;
+  FLOAT sp_fStartHealth;
+  FLOAT sp_fMaxHealth;
+  FLOAT sp_fMaxArmor;
+  FLOAT sp_fEnemyMultiplier;
+  FLOAT sp_fFireSpeed;
+  FLOAT sp_fAmmoMultiplier;
+  BOOL  sp_bMutators;
+  BOOL  sp_bHeatDamage;
+  BOOL  sp_bImpactDamage;
+  FLOAT sp_fEnemyDamageMp;
+  FLOAT sp_fPlayerDamageMp;
+  FLOAT sp_fSelfDamageMp;
+
+  // [Cecil] MP Options
+  BOOL sp_bUseWeaponRemoving;
+  BOOL sp_bFillAmmo;
+  BOOL sp_bKnifeEnable;
+  BOOL sp_bChainsawEnable;
+  BOOL sp_bColtEnable;
+  BOOL sp_bDColtEnable;
+  BOOL sp_bShotgunEnable;
+  BOOL sp_bDShotgunEnable;
+  BOOL sp_bTommygunEnable;
+  BOOL sp_bMinigunEnable;
+  BOOL sp_bRLauncherEnable;
+  BOOL sp_bGLauncherEnable;
+  BOOL sp_bFlamerEnable;
+  BOOL sp_bSniperEnable;
+  BOOL sp_bLaserEnable;
+  BOOL sp_bCannonEnable;
+
+  INDEX sp_iWeaponItems;
+  INDEX sp_iReplaceWIT;
+
+  BOOL sp_bKnifeItemEnable;
+  BOOL sp_bChainsawItemEnable;
+  BOOL sp_bColtItemEnable;
+  BOOL sp_bShotgunItemEnable;
+  BOOL sp_bDShotgunItemEnable;
+  BOOL sp_bTommygunItemEnable;
+  BOOL sp_bMinigunItemEnable;
+  BOOL sp_bRLauncherItemEnable;
+  BOOL sp_bGLauncherItemEnable;
+  BOOL sp_bFlamerItemEnable;
+  BOOL sp_bSniperItemEnable;
+  BOOL sp_bLaserItemEnable;
+  BOOL sp_bCannonItemEnable;
+  BOOL sp_bRocketExplode;
+  BOOL sp_bTeslaGun;
+  BOOL sp_bExplosiveLaser;
+
+  BOOL sp_bEnableInvulnerability;
+  BOOL sp_bEnableInvisibility;
+  BOOL sp_bEnableSeriousDamage;
+  BOOL sp_bEnableSeriousSpeed;
 };
 
 // NOTE: never instantiate CSessionProperties, as its size is not fixed to the size defined in engine

@@ -15,7 +15,7 @@ event EGhostBusterRay {
 
 %{
 #define HIT_DISTANCE 50.0f      // ray hit distance
-#define HIT_DAMAGE 15.0f         // hit damage for every lerping bullet
+#define HIT_DAMAGE 10.0f         // hit damage for every lerping bullet
 
 void CGhostBusterRay_OnPrecache(CDLLEntityClass *pdec, INDEX iUser) 
 {
@@ -168,7 +168,7 @@ functions:
     // init bullet
     EBulletInit eInit;
     eInit.penOwner = ((CPlayerWeapons&)*m_penOwner).m_penPlayer;
-    eInit.fDamage = HIT_DAMAGE;
+    eInit.fDamage = HIT_DAMAGE*(GetSP()->sp_fFireSpeed/2);
     penBullet->Initialize(eInit);
     ((CBullet&)*penBullet).m_EdtDamage = DMT_BULLET;
   };
@@ -182,7 +182,7 @@ functions:
     ((CBullet&)*penBullet).CalcTarget(HIT_DISTANCE);
     ((CBullet&)*penBullet).m_fBulletSize = 0.5f;
     ((CBullet&)*penBullet).CalcJitterTarget(0.02f*HIT_DISTANCE);
-    ((CBullet&)*penBullet).LaunchBullet(TRUE, FALSE, TRUE);
+    ((CBullet&)*penBullet).LaunchBullet(FALSE, FALSE, FALSE);
     ((CBullet&)*penBullet).DestroyBullet();
   };
 
@@ -209,13 +209,15 @@ procedures:
     SetCollisionFlags(ECF_IMMATERIAL);
     SetModel(MODEL_RAY);
     SetModelMainTexture(TEXTURE_RAY);
+    GetModelObject()->StretchModel(FLOAT3D(0,0,0));
+    ModelChangeNotify();
 
-    try {
+    /*try {
       m_aoLightAnim.SetData_t(CTFILENAME("Animations\\GhostbusterLightning.ani"));
       m_aoLightAnim.PlayAnim(0,AOF_LOOPING);
     } catch (char *strError) {
       CPrintF("%s", strError);
-    }
+    }*/
 
     // setup light source
     SetupLightSource();

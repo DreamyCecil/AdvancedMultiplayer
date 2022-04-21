@@ -868,43 +868,6 @@ functions:
     vNormalizedDamage *= 1.75f;
     FLOAT3D vBodySpeed = en_vCurrentTranslationAbsolute-en_vGravityDir*(en_vGravityDir%en_vCurrentTranslationAbsolute);
 
-    // spawn debris
-/*
-    switch (m_EetType) {
-      case ELT_ICE: {
-        Debris_Begin(EIBT_ICE, DPT_NONE, BET_NONE, fEntitySize, vNormalizedDamage, vBodySpeed, 1.0f, 0.0f);
-        for (iDebris=0; iDebris<iCount; iDebris++) {
-          CEntityPointer pen;
-          pen = Debris_Spawn(this, this, MODEL_ELEM_ICE, TEXTURE_ELEM_ICE, 0, 0, 0, 0, 0.5f,
-            FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-          AddAttachmentToModel(this, *(pen->GetModelObject()), ICEPYRAMID_ATTACHMENT_FLARE,
-            MODEL_ELEM_ICE_FLARE, TEXTURE_ELEM_FLARE, 0, 0, 0);
-          pen->GetModelObject()->StretchModel(pen->GetModelObject()->mo_Stretch);
-          ModelChangeNotify();
-        }}
-        break;
-      case ELT_LAVA: {
-        Debris_Begin(EIBT_FIRE, DPT_NONE, BET_NONE, fEntitySize, vNormalizedDamage, vBodySpeed, 1.0f, 0.0f);
-        for (iDebris=0; iDebris<iCount; iDebris++) {
-          CEntityPointer pen;
-          pen = Debris_Spawn(this, this, MODEL_ELEM_LAVASTONE, TEXTURE_ELEM_LAVASTONE, 0, 0, 0, 0, 0.5f,
-            FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-          AddAttachmentToModel(this, *(pen->GetModelObject()), LAVASTONE_ATTACHMENT_FLARE,
-            MODEL_ELEM_LAVASTONE_FLARE, TEXTURE_ELEM_FLARE, 0, 0, 0);
-          pen->GetModelObject()->StretchModel(pen->GetModelObject()->mo_Stretch);
-          ModelChangeNotify();
-        }}
-        break;
-      case ELT_STONE: {
-        Debris_Begin(EIBT_ROCK, DPT_NONE, BET_NONE, fEntitySize, vNormalizedDamage, vBodySpeed, 1.0f, 0.0f);
-        for (iDebris=0; iDebris<iCount; iDebris++) {
-          Debris_Spawn(this, this, MODEL_ELEM_STONE, TEXTURE_ELEM_STONE, 0, 0, 0, 0, 0.5f,
-            FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-        }}
-        break;
-    }
-    */
-
     // hide yourself (must do this after spawning debris)
     SwitchToEditorModel();
     SetPhysicsFlags(EPF_MODEL_IMMATERIAL);

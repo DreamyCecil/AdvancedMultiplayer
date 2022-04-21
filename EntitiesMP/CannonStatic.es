@@ -205,20 +205,22 @@ virtual CTString GetPlayerKillDescription(const CTString &strPlayerName, const E
     FLOAT3D vBodySpeed = en_vCurrentTranslationAbsolute-en_vGravityDir*(en_vGravityDir%en_vCurrentTranslationAbsolute);
     
     // spawn debris
-    Debris_Begin(EIBT_WOOD, DPT_NONE, BET_NONE, 1.0f, vNormalizedDamage, vBodySpeed, 5.0f, 2.0f);
+    if (GetSP()->sp_iDebris == 2) {
+      Debris_Begin(EIBT_WOOD, DPT_NONE, BET_NONE, 1.0f, vNormalizedDamage, vBodySpeed, 5.0f, 2.0f);
     
-    Debris_Spawn(this, this, MODEL_DEBRIS_MUZZLE, TEXTURE_CANNON, 0, 0, 0, 0, m_fSize,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-    Debris_Spawn(this, this, MODEL_DEBRIS_WHEEL, TEXTURE_TURRET, 0, 0, 0, 0, m_fSize,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-    Debris_Spawn(this, this, MODEL_DEBRIS_WHEEL, TEXTURE_TURRET, 0, 0, 0, 0, m_fSize,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-    Debris_Spawn(this, this, MODEL_DEBRIS_WOOD, TEXTURE_TURRET, 0, 0, 0, 0, m_fSize,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-    Debris_Spawn(this, this, MODEL_DEBRIS_WOOD, TEXTURE_TURRET, 0, 0, 0, 0, m_fSize,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-    Debris_Spawn(this, this, MODEL_BALL, TEXTURE_BALL, 0, 0, 0, 0, m_fSize/2.0f,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
+      Debris_Spawn(this, this, MODEL_DEBRIS_MUZZLE, TEXTURE_CANNON, 0, 0, 0, 0, m_fSize,
+        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
+      Debris_Spawn(this, this, MODEL_DEBRIS_WHEEL, TEXTURE_TURRET, 0, 0, 0, 0, m_fSize,
+        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
+      Debris_Spawn(this, this, MODEL_DEBRIS_WHEEL, TEXTURE_TURRET, 0, 0, 0, 0, m_fSize,
+        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
+      Debris_Spawn(this, this, MODEL_DEBRIS_WOOD, TEXTURE_TURRET, 0, 0, 0, 0, m_fSize,
+        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
+      Debris_Spawn(this, this, MODEL_DEBRIS_WOOD, TEXTURE_TURRET, 0, 0, 0, 0, m_fSize,
+        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
+      Debris_Spawn(this, this, MODEL_BALL, TEXTURE_BALL, 0, 0, 0, 0, m_fSize/2.0f,
+        FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
+    }
 
     // spawn explosion
     CPlacement3D plExplosion = GetPlacement();

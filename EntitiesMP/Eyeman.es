@@ -303,48 +303,6 @@ functions:
   };
 
 /************************************************************
- *                 BLOW UP FUNCTIONS                        *
- ************************************************************/
-  // spawn body parts
-  /*void BlowUp(void)
-  {
-    // get your size
-    FLOATaabbox3D box;
-    GetBoundingBox(box);
-    FLOAT fEntitySize = box.Size().MaxNorm();
-
-    FLOAT3D vNormalizedDamage = m_vDamage-m_vDamage*(m_fBlowUpAmount/m_vDamage.Length());
-    vNormalizedDamage /= Sqrt(vNormalizedDamage.Length());
-
-    vNormalizedDamage *= 0.75f;
-
-    FLOAT3D vBodySpeed = en_vCurrentTranslationAbsolute-en_vGravityDir*(en_vGravityDir%en_vCurrentTranslationAbsolute);
-
-    // spawn debris
-    Debris_Begin(EIBT_FLESH, DPT_BLOODTRAIL, BET_BLOODSTAIN, fEntitySize, vNormalizedDamage, vBodySpeed, 1.0f, 0.0f);
-
-    INDEX iTextureID = TEXTURE_EYEMAN_SOLDIER;
-    if (m_EecChar==EYC_SERGEANT)
-    {
-      iTextureID = TEXTURE_EYEMAN_SERGEANT;
-    }
-
-    Debris_Spawn(this, this, MODEL_EYEMAN_BODY, iTextureID, 0, 0, 0, 0, 0.0f,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-    Debris_Spawn(this, this, MODEL_EYEMAN_HAND, iTextureID, 0, 0, 0, 0, 0.0f,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-    Debris_Spawn(this, this, MODEL_EYEMAN_HAND, iTextureID, 0, 0, 0, 0, 0.0f,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-    Debris_Spawn(this, this, MODEL_EYEMAN_LEGS, iTextureID, 0, 0, 0, 0, 0.0f,
-      FLOAT3D(FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f, FRnd()*0.6f+0.2f));
-
-    // hide yourself (must do this after spawning debris)
-    SwitchToEditorModel();
-    SetPhysicsFlags(EPF_MODEL_IMMATERIAL);
-    SetCollisionFlags(ECF_IMMATERIAL);
-  };*/
-
-/************************************************************
  *                     MOVING FUNCTIONS                     *
  ************************************************************/
   // check whether may move while attacking
@@ -393,8 +351,10 @@ procedures:
       GetEntityPointRatio(
         FLOAT3D(Lerp(-0.2f, +0.2f, FRnd()), Lerp(-0.2f, +0.2f, FRnd()), -1.0f),
         plOne.pl_PositionVector);
-      CEntityPointer penBloodCloud = CreateEntity( plOne, CLASS_BASIC_EFFECT);
-      penBloodCloud->Initialize( eSpawnEffect);
+      if (GetSP()->sp_bEffects) {
+        CEntityPointer penBloodCloud = CreateEntity( plOne, CLASS_BASIC_EFFECT);
+        penBloodCloud->Initialize( eSpawnEffect);
+      }
     }
     autowait(0.24f);
 

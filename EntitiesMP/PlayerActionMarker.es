@@ -83,7 +83,16 @@ functions:
         // send it event to start auto actions from here
         EAutoAction eAutoAction;
         eAutoAction.penFirstMarker = this;
-        eTrigger.penCaused->SendEvent(eAutoAction);
+        if (!SingleOnlyWorld(this)) {
+          eTrigger.penCaused->SendEvent(eAutoAction);
+        } else {
+          for (INDEX i = 0; i < GetMaxPlayers(); i++) {
+            CEntity *pen = GetPlayerEntity(i);
+            if (pen != NULL && !(pen->GetFlags()&ENF_DELETED)) {
+              pen->SendEvent(eAutoAction);
+            }
+          }
+        }
       }
       return TRUE;
     }

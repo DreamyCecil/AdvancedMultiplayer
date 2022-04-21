@@ -1,0 +1,27 @@
+# Unchanged SDK
+d3d8*
+*.lib
+
+Engine/*
+EngineGUI/*
+Entities/*
+GameGUIMP/*
+Models/*
+ModelsMP/*
+
+# Ecc generated files
+EntitiesMP/*.cpp
+EntitiesMP/*.h
+!EntitiesMP/Common/*.cpp
+!EntitiesMP/Common/*.h
+!EntitiesMP/StdH/*.cpp
+!EntitiesMP/StdH/*.h
+
+EntitiesMP/Debug/*
+EntitiesMP/Release/*
+GameMP/Debug/*
+GameMP/Release/*
+
+*.ncb
+*.opt
+*.plg
